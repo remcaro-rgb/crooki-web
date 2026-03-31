@@ -1,0 +1,115 @@
+# Crooki - Setup Guide
+
+## Credentials Needed
+
+### 1. Supabase (Backend & Auth)
+
+Go to https://supabase.com → Create new project
+
+Collect:
+- **Project URL**: `https://xxxxx.supabase.co`
+- **Anon Key**: Found in Settings → API → `anon public`
+- **Service Role Key**: Found in Settings → API → `service_role secret`
+
+Update `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
+```
+
+### 2. Run the Database Schema
+
+In the Supabase dashboard → SQL Editor → paste the contents of `supabase/schema.sql` and run.
+
+### 3. Create Storage Bucket
+
+In Supabase dashboard → Storage → New bucket:
+- Name: `product-images`
+- Public: ✅ Yes
+
+### 4. Create Admin User
+
+In Supabase dashboard → Authentication → Users → Add user:
+- Email: `admin@crooki.com`
+- Password: (choose a secure password)
+
+### 5. Upload Product Images
+
+After setting up Supabase credentials, run:
+```bash
+node scripts/upload-images.mjs
+```
+
+This uploads all product photos from `public/images/` to Supabase Storage.
+
+---
+
+## Local Development
+
+```bash
+npm run dev
+# Open http://localhost:3001
+```
+
+---
+
+## GitHub Setup
+
+```bash
+# Create a new repo at github.com manually, then:
+git remote add origin https://github.com/YOUR_USERNAME/crooki-web.git
+git push -u origin main
+```
+
+**GitHub token needed:** Classic token with `repo` scope at https://github.com/settings/tokens
+
+---
+
+## Vercel Deployment
+
+### Option A: Vercel CLI
+```bash
+npm install -g vercel
+vercel login
+vercel --prod
+```
+
+### Option B: Vercel Dashboard
+1. Go to https://vercel.com → New Project
+2. Import from GitHub
+3. Add Environment Variables (same as `.env.local`)
+4. Change `NEXT_PUBLIC_SITE_URL` to your Vercel domain
+
+### Environment Variables for Vercel:
+| Variable | Value |
+|----------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Your Supabase service role key |
+| `NEXT_PUBLIC_SITE_URL` | https://your-domain.vercel.app |
+
+---
+
+## Admin Panel
+
+Once deployed:
+- URL: `https://your-domain/admin` (or `http://localhost:3001/admin`)
+- Login: `admin@crooki.com` + password you set in Supabase Auth
+- Create/edit products with photos
+- View and manage orders
+
+---
+
+## Routes
+
+| Path | Description |
+|------|-------------|
+| `/` or `/es` | Home (Spanish) |
+| `/en` | Home (English) |
+| `/menu` | Full cookie menu |
+| `/pedido` | Checkout |
+| `/admin` | Admin dashboard |
+| `/admin/login` | Admin login |
+| `/admin/productos/nuevo` | Create product |

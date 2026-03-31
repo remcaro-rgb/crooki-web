@@ -1,6 +1,24 @@
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
 import ProductGrid from "@/components/menu/ProductGrid";
+import type { Product } from "@/lib/types";
+import { mockProducts } from "@/lib/mock-products";
+
+async function getProducts(): Promise<Product[]> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your_")) {
+    return mockProducts;
+  }
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("products")
+      .select("*, product_images(*)")
+      .order("display_order");
+    return data || mockProducts;
+  } catch {
+    return mockProducts;
+  }
+}
 
 export default async function MenuPage({
   params,
@@ -9,12 +27,7 @@ export default async function MenuPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "menu" });
-  const supabase = await createClient();
-
-  const { data: products } = await supabase
-    .from("products")
-    .select("*, product_images(*)")
-    .order("display_order");
+  const products = await getProducts();
 
   return (
     <div>
@@ -30,7 +43,7 @@ export default async function MenuPage({
       {/* Product grid */}
       <div className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <ProductGrid products={products || []} locale={locale} />
+          <ProductGrid products={products} locale={locale} />
         </div>
       </div>
     </div>
