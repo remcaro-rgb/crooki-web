@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "order": "Order now",
+    "admin": "Admin"
+  },
+  "hero": {
+    "badge": "Artisan · Made with love",
+    "title": "Cookies that steal your heart",
+    "subtitle": "Discover the pleasure of the perfect cookie. Soft dough, incredible fillings and flavors you won't forget.",
+    "cta_order": "Order now",
+    "cta_menu": "View menu"
+  },
+  "featured": {
+    "title": "Our flavors",
+    "subtitle": "Each cookie is a masterpiece made with the finest ingredients"
+  },
+  "about": {
+    "title": "Baked with passion",
+    "description": "At Crooki we believe every cookie should be a unique experience. We use only the finest ingredients, artisan recipes and lots of love to create the perfect cookies.",
+    "feature1": "Premium ingredients",
+    "feature2": "Artisan recipes",
+    "feature3": "Made with love"
+  },
+  "menu": {
+    "title": "Our Menu",
+    "subtitle": "Choose your favorite flavor",
+    "add_to_cart": "Add",
+    "sold_out": "Sold out",
+    "price_unit": "each"
+  },
+  "cart": {
+    "title": "Your order",
+    "empty": "Your cart is empty",
+    "empty_desc": "Add some cookies to get started",
+    "go_to_menu": "View menu",
+    "subtotal": "Subtotal",
+    "checkout": "Place order",
+    "remove": "Remove",
+    "quantity": "Quantity"
+  },
+  "checkout": {
+    "title": "Place your order",
+    "subtitle": "Fill in your details to complete your order",
+    "name": "Full name",
+    "name_placeholder": "Your name",
+    "email": "Email",
+    "email_placeholder": "you@email.com",
+    "phone": "Phone / WhatsApp",
+    "phone_placeholder": "+1 555 123 4567",
+    "address": "Delivery address",
+    "address_placeholder": "Street, number, apartment.",
+    "notes": "Additional notes",
+    "notes_placeholder": "Special instructions, preferred delivery time...",
+    "order_summary": "Order summary",
+    "total": "Total",
+    "submit": "Place order",
+    "submitting": "Sending...",
+    "required": "Required field"
+  },
+  "confirmation": {
+    "title": "Order received!",
+    "subtitle": "We'll contact you soon to coordinate delivery",
+    "order_number": "Order number",
+    "back_home": "Back to home",
+    "whatsapp_confirm": "Confirm via WhatsApp"
+  },
+  "admin": {
+    "dashboard": "Admin panel",
+    "products": "Products",
+    "orders": "Orders",
+    "new_product": "New product",
+    "edit_product": "Edit product",
+    "product_name": "Name (Spanish)",
+    "product_name_en": "Name (English)",
+    "product_description": "Description (Spanish)",
+    "product_description_en": "Description (English)",
+    "product_price": "Price",
+    "product_images": "Images",
+    "product_available": "Available",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "logout": "Sign out",
+    "login_title": "Admin access",
+    "email": "Email",
+    "password": "Password",
+    "login": "Sign in",
+    "order_status": "Status",
+    "order_pending": "Pending",
+    "order_confirmed": "Confirmed",
+    "order_delivered": "Delivered",
+    "order_cancelled": "Cancelled",
+    "upload_images": "Upload images",
+    "drag_drop": "Drag images here or click to select",
+    "no_products": "No products yet",
+    "no_orders": "No orders yet"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "close": "Close",
+    "back": "Back",
+    "cookies": "cookies",
+    "currency": "$"
+  }
+}

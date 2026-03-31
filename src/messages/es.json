@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "menu": "Menú",
+    "order": "Pedir ahora",
+    "admin": "Administrador"
+  },
+  "hero": {
+    "badge": "Artesanal · Hecho con amor",
+    "title": "Galletas que enamoran",
+    "subtitle": "Descubrí el placer de una galleta perfecta. Masas suaves, rellenos increíbles y sabores que no olvidarás.",
+    "cta_order": "Pedir ahora",
+    "cta_menu": "Ver menú"
+  },
+  "featured": {
+    "title": "Nuestros sabores",
+    "subtitle": "Cada galleta es una obra de arte hecha con los mejores ingredientes"
+  },
+  "about": {
+    "title": "Horneadas con pasión",
+    "description": "En Crooki creemos que cada galleta debe ser una experiencia única. Usamos solo los mejores ingredientes, recetas artesanales y mucho amor para crear las galletas perfectas.",
+    "feature1": "Ingredientes premium",
+    "feature2": "Recetas artesanales",
+    "feature3": "Hecho con amor"
+  },
+  "menu": {
+    "title": "Nuestro Menú",
+    "subtitle": "Elegí tu sabor favorito",
+    "add_to_cart": "Agregar",
+    "sold_out": "Agotado",
+    "price_unit": "c/u"
+  },
+  "cart": {
+    "title": "Tu pedido",
+    "empty": "Tu carrito está vacío",
+    "empty_desc": "Agregá algunas galletas para comenzar",
+    "go_to_menu": "Ver menú",
+    "subtotal": "Subtotal",
+    "checkout": "Confirmar pedido",
+    "remove": "Eliminar",
+    "quantity": "Cantidad"
+  },
+  "checkout": {
+    "title": "Confirmar pedido",
+    "subtitle": "Completá tus datos para hacer el pedido",
+    "name": "Nombre completo",
+    "name_placeholder": "Tu nombre",
+    "email": "Email",
+    "email_placeholder": "tu@email.com",
+    "phone": "Teléfono / WhatsApp",
+    "phone_placeholder": "+54 9 11 1234-5678",
+    "address": "Dirección de entrega",
+    "address_placeholder": "Calle, número, piso, depto.",
+    "notes": "Comentarios adicionales",
+    "notes_placeholder": "Indicaciones especiales, horario preferido...",
+    "order_summary": "Resumen del pedido",
+    "total": "Total",
+    "submit": "Hacer pedido",
+    "submitting": "Enviando...",
+    "required": "Campo requerido"
+  },
+  "confirmation": {
+    "title": "¡Pedido recibido!",
+    "subtitle": "Te contactaremos pronto para coordinar la entrega",
+    "order_number": "Número de pedido",
+    "back_home": "Volver al inicio",
+    "whatsapp_confirm": "Confirmar por WhatsApp"
+  },
+  "admin": {
+    "dashboard": "Panel de administración",
+    "products": "Productos",
+    "orders": "Pedidos",
+    "new_product": "Nuevo producto",
+    "edit_product": "Editar producto",
+    "product_name": "Nombre (Español)",
+    "product_name_en": "Nombre (Inglés)",
+    "product_description": "Descripción (Español)",
+    "product_description_en": "Descripción (Inglés)",
+    "product_price": "Precio",
+    "product_images": "Imágenes",
+    "product_available": "Disponible",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "logout": "Cerrar sesión",
+    "login_title": "Acceso administrador",
+    "email": "Email",
+    "password": "Contraseña",
+    "login": "Ingresar",
+    "order_status": "Estado",
+    "order_pending": "Pendiente",
+    "order_confirmed": "Confirmado",
+    "order_delivered": "Entregado",
+    "order_cancelled": "Cancelado",
+    "upload_images": "Subir imágenes",
+    "drag_drop": "Arrastrá imágenes aquí o hacé clic para seleccionar",
+    "no_products": "No hay productos aún",
+    "no_orders": "No hay pedidos aún"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "cookies": "galletas",
+    "currency": "$"
+  }
+}
