@@ -3,7 +3,8 @@
     "home": "Home",
     "menu": "Menu",
     "order": "Order now",
-    "admin": "Admin"
+    "admin": "Admin",
+    "merch": "Merch"
   },
   "hero": {
     "badge": "Artisan · Made with love",
@@ -28,7 +29,22 @@
     "subtitle": "Choose your favorite flavor",
     "add_to_cart": "Add",
     "sold_out": "Sold out",
-    "price_unit": "each"
+    "price_unit": "each",
+    "coming_soon": "Coming soon"
+  },
+  "categories": {
+    "galletas": "Cookies",
+    "cajas": "Cookie boxes",
+    "helados": "Ice cream",
+    "especiales": "Specials",
+    "salados": "Savory",
+    "malteadas": "Milkshakes",
+    "bebidas-frias": "Cold drinks",
+    "bebidas-calientes": "Hot drinks"
+  },
+  "merch": {
+    "title": "Crooki Merch",
+    "subtitle": "Take a piece of Crooki home with you"
   },
   "cart": {
     "title": "Your order",
@@ -48,7 +64,7 @@
     "email": "Email",
     "email_placeholder": "you@email.com",
     "phone": "Phone / WhatsApp",
-    "phone_placeholder": "+1 555 123 4567",
+    "phone_placeholder": "+57 300 123 4567",
     "address": "Delivery address",
     "address_placeholder": "Street, number, apartment.",
     "notes": "Additional notes",
@@ -96,6 +112,11 @@
     "drag_drop": "Drag images here or click to select",
     "no_products": "No products yet",
     "no_orders": "No orders yet"
+  },
+  "contact": {
+    "whatsapp": "Chat with us on WhatsApp",
+    "instagram": "Follow us on Instagram",
+    "tiktok": "Follow us on TikTok"
   },
   "common": {
     "loading": "Loading...",

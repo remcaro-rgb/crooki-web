@@ -12,6 +12,17 @@ CREATE TABLE IF NOT EXISTS products (
   description_es TEXT NOT NULL DEFAULT '',
   description_en TEXT NOT NULL DEFAULT '',
   price NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  category TEXT NOT NULL DEFAULT 'galletas'
+    CHECK (category IN (
+      'galletas',
+      'cajas',
+      'helados',
+      'especiales',
+      'salados',
+      'malteadas',
+      'bebidas-frias',
+      'bebidas-calientes'
+    )),
   available BOOLEAN NOT NULL DEFAULT true,
   display_order INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -57,6 +68,7 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_products_display_order ON products(display_order);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 
 -- RLS Policies
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;

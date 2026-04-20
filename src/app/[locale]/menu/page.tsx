@@ -40,7 +40,7 @@ export default async function MenuPage({
         <p className="text-white/80 text-lg">{t("subtitle")}</p>
       </div>
 
-      {/* Product grid */}
+      {/* Product sections (all categories visible, no horizontal scroll) */}
       <div className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <ProductGrid products={products} locale={locale} />

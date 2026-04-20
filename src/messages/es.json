@@ -3,12 +3,13 @@
     "home": "Inicio",
     "menu": "Menú",
     "order": "Pedir ahora",
-    "admin": "Administrador"
+    "admin": "Administrador",
+    "merch": "Merch"
   },
   "hero": {
     "badge": "Artesanal · Hecho con amor",
     "title": "Galletas que enamoran",
-    "subtitle": "Descubrí el placer de una galleta perfecta. Masas suaves, rellenos increíbles y sabores que no olvidarás.",
+    "subtitle": "Descubre el placer de una galleta perfecta. Masas suaves, rellenos increíbles y sabores que no olvidarás.",
     "cta_order": "Pedir ahora",
     "cta_menu": "Ver menú"
   },
@@ -25,15 +26,30 @@
   },
   "menu": {
     "title": "Nuestro Menú",
-    "subtitle": "Elegí tu sabor favorito",
+    "subtitle": "Elige tu sabor favorito",
     "add_to_cart": "Agregar",
     "sold_out": "Agotado",
-    "price_unit": "c/u"
+    "price_unit": "c/u",
+    "coming_soon": "Próximamente"
+  },
+  "categories": {
+    "galletas": "Galletas",
+    "cajas": "Cajas de galletas",
+    "helados": "Helados",
+    "especiales": "Especiales",
+    "salados": "Salados",
+    "malteadas": "Malteadas",
+    "bebidas-frias": "Bebidas frías",
+    "bebidas-calientes": "Bebidas calientes"
+  },
+  "merch": {
+    "title": "Merch Crooki",
+    "subtitle": "Llévate un pedacito de Crooki contigo"
   },
   "cart": {
     "title": "Tu pedido",
     "empty": "Tu carrito está vacío",
-    "empty_desc": "Agregá algunas galletas para comenzar",
+    "empty_desc": "Agrega algunas galletas para comenzar",
     "go_to_menu": "Ver menú",
     "subtotal": "Subtotal",
     "checkout": "Confirmar pedido",
@@ -42,15 +58,15 @@
   },
   "checkout": {
     "title": "Confirmar pedido",
-    "subtitle": "Completá tus datos para hacer el pedido",
+    "subtitle": "Completa tus datos para hacer el pedido",
     "name": "Nombre completo",
     "name_placeholder": "Tu nombre",
-    "email": "Email",
+    "email": "Correo electrónico",
     "email_placeholder": "tu@email.com",
     "phone": "Teléfono / WhatsApp",
-    "phone_placeholder": "+54 9 11 1234-5678",
+    "phone_placeholder": "+57 300 123 4567",
     "address": "Dirección de entrega",
-    "address_placeholder": "Calle, número, piso, depto.",
+    "address_placeholder": "Calle, número, apto.",
     "notes": "Comentarios adicionales",
     "notes_placeholder": "Indicaciones especiales, horario preferido...",
     "order_summary": "Resumen del pedido",
@@ -84,7 +100,7 @@
     "delete": "Eliminar",
     "logout": "Cerrar sesión",
     "login_title": "Acceso administrador",
-    "email": "Email",
+    "email": "Correo electrónico",
     "password": "Contraseña",
     "login": "Ingresar",
     "order_status": "Estado",
@@ -93,9 +109,14 @@
     "order_delivered": "Entregado",
     "order_cancelled": "Cancelado",
     "upload_images": "Subir imágenes",
-    "drag_drop": "Arrastrá imágenes aquí o hacé clic para seleccionar",
+    "drag_drop": "Arrastra imágenes aquí o haz clic para seleccionar",
     "no_products": "No hay productos aún",
     "no_orders": "No hay pedidos aún"
+  },
+  "contact": {
+    "whatsapp": "Chatea con nosotros por WhatsApp",
+    "instagram": "Síguenos en Instagram",
+    "tiktok": "Síguenos en TikTok"
   },
   "common": {
     "loading": "Cargando...",

@@ -1,5 +1,26 @@
 export type Locale = "es" | "en";
 
+export type Category =
+  | "galletas"
+  | "cajas"
+  | "helados"
+  | "especiales"
+  | "salados"
+  | "malteadas"
+  | "bebidas-frias"
+  | "bebidas-calientes";
+
+export const CATEGORY_ORDER: Category[] = [
+  "galletas",
+  "cajas",
+  "helados",
+  "especiales",
+  "salados",
+  "malteadas",
+  "bebidas-frias",
+  "bebidas-calientes",
+];
+
 export interface ProductImage {
   id: string;
   product_id: string;
@@ -14,6 +35,7 @@ export interface Product {
   description_es: string;
   description_en: string;
   price: number;
+  category: Category;
   available: boolean;
   display_order: number;
   created_at: string;

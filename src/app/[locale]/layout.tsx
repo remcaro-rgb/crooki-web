@@ -4,6 +4,7 @@ import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import { Toaster } from "@/components/ui/sonner";
 import CartDrawer from "@/components/order/CartDrawer";
 
@@ -26,6 +27,7 @@ export default async function LocaleLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <CartDrawer />
+      <WhatsAppButton />
       <Toaster position="bottom-center" />
     </NextIntlClientProvider>
   );
