@@ -155,4 +155,11 @@
   .bg-crooki-warm {
     background-color: #f5ebe0;
   }
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
