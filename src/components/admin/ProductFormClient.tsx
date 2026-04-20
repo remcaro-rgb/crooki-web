@@ -1,20 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2, Upload, X, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import type { Product } from "@/lib/types";
+import type { CategoryKind, CategoryRow, Product } from "@/lib/types";
 
 interface Props {
   locale: string;
   mode: "create" | "edit";
   product?: Product;
+  categories: CategoryRow[];
+  initialKind?: CategoryKind;
+  initialCategory?: string;
 }
 
-export default function ProductFormClient({ locale, mode, product }: Props) {
+export default function ProductFormClient({
+  locale,
+  mode,
+  product,
+  categories,
+  initialKind = "menu",
+  initialCategory,
+}: Props) {
   const t = useTranslations("admin");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,12 +34,30 @@ export default function ProductFormClient({ locale, mode, product }: Props) {
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
+  // Determine kind from the product's category (edit) or the URL hint (create).
+  const productKind: CategoryKind = useMemo(() => {
+    const match = categories.find((c) => c.slug === product?.category);
+    return (match?.kind as CategoryKind) ?? initialKind;
+  }, [categories, product?.category, initialKind]);
+
+  const [kind, setKind] = useState<CategoryKind>(productKind);
+
+  const categoriesForKind = useMemo(
+    () => categories.filter((c) => c.kind === kind).sort((a, b) => a.display_order - b.display_order),
+    [categories, kind],
+  );
+
   const [form, setForm] = useState({
     name_es: product?.name_es ?? "",
     name_en: product?.name_en ?? "",
     description_es: product?.description_es ?? "",
     description_en: product?.description_en ?? "",
     price: product?.price?.toString() ?? "",
+    category:
+      product?.category ??
+      initialCategory ??
+      categories.find((c) => c.kind === initialKind)?.slug ??
+      "",
     available: product?.available ?? true,
     display_order: product?.display_order?.toString() ?? "0",
   });
@@ -92,6 +120,11 @@ export default function ProductFormClient({ locale, mode, product }: Props) {
     }
     setLoading(true);
 
+    if (!form.category) {
+      toast.error("La categoría es requerida");
+      return;
+    }
+
     try {
       const supabase = createClient();
       const productData = {
@@ -100,6 +133,7 @@ export default function ProductFormClient({ locale, mode, product }: Props) {
         description_es: form.description_es,
         description_en: form.description_en,
         price: parseFloat(form.price) || 0,
+        category: form.category,
         available: form.available,
         display_order: parseInt(form.display_order) || 0,
       };
@@ -233,6 +267,55 @@ export default function ProductFormClient({ locale, mode, product }: Props) {
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 transition-all resize-none"
               placeholder="Soft dough cookie with salted caramel filling..."
             />
+          </div>
+        </div>
+
+        {/* Kind + Category */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1.5 text-gray-700">Tipo</label>
+            <div className="flex gap-2">
+              {(["menu", "merch"] as const).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => {
+                    setKind(k);
+                    const first = categories.find((c) => c.kind === k);
+                    if (first) setForm((f) => ({ ...f, category: first.slug }));
+                  }}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-colors border"
+                  style={{
+                    backgroundColor: kind === k ? "#8b0031" : "transparent",
+                    color: kind === k ? "#ffffff" : "#8b0031",
+                    borderColor: kind === k ? "#8b0031" : "#e5e7eb",
+                  }}
+                >
+                  {k === "menu" ? "Menú" : "Merch"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1.5 text-gray-700">Categoría *</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 transition-all bg-white"
+              required
+            >
+              <option value="">Seleccionar categoría…</option>
+              {categoriesForKind.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.label_es}
+                </option>
+              ))}
+            </select>
+            {categoriesForKind.length === 0 && (
+              <p className="text-xs text-red-600 mt-1">
+                No hay categorías para este tipo. Crea una primero.
+              </p>
+            )}
           </div>
         </div>
 

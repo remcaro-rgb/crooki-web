@@ -1,16 +1,12 @@
 export type Locale = "es" | "en";
 
-export type Category =
-  | "galletas"
-  | "cajas"
-  | "helados"
-  | "especiales"
-  | "salados"
-  | "malteadas"
-  | "bebidas-frias"
-  | "bebidas-calientes";
+export type CategoryKind = "menu" | "merch";
 
-export const CATEGORY_ORDER: Category[] = [
+// Kept as string so admin-created categories work without a TS change.
+// The seeded menu order below only controls the legacy mock fallback.
+export type Category = string;
+
+export const CATEGORY_ORDER: string[] = [
   "galletas",
   "cajas",
   "helados",
@@ -20,6 +16,15 @@ export const CATEGORY_ORDER: Category[] = [
   "bebidas-frias",
   "bebidas-calientes",
 ];
+
+export interface CategoryRow {
+  slug: string;
+  label_es: string;
+  label_en: string;
+  kind: CategoryKind;
+  display_order: number;
+  created_at?: string;
+}
 
 export interface ProductImage {
   id: string;
@@ -35,7 +40,7 @@ export interface Product {
   description_es: string;
   description_en: string;
   price: number;
-  category: Category;
+  category: string;
   available: boolean;
   display_order: number;
   created_at: string;

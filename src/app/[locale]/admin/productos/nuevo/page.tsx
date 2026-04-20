@@ -1,17 +1,31 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import ProductFormClient from "@/components/admin/ProductFormClient";
+import type { CategoryRow } from "@/lib/types";
 
 export default async function NewProductPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ kind?: string; category?: string }>;
 }) {
   const { locale } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/admin/login`);
+  const { supabase } = await requireAdmin(locale);
+  const { kind, category } = await searchParams;
 
-  return <ProductFormClient locale={locale} mode="create" />;
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("kind")
+    .order("display_order");
+
+  return (
+    <ProductFormClient
+      locale={locale}
+      mode="create"
+      categories={(categories as CategoryRow[]) ?? []}
+      initialKind={kind === "merch" ? "merch" : "menu"}
+      initialCategory={category}
+    />
+  );
 }

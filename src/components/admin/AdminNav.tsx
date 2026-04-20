@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { LogOut, Package, ShoppingBag } from "lucide-react";
+import { LogOut, Package, ShoppingBag, Tag } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Props {
@@ -31,7 +31,11 @@ export default function AdminNav({ locale, user }: Props) {
               <Package className="w-4 h-4" />
               {t("products")}
             </a>
-            <a href={`/${locale}/admin`} className="text-white/80 hover:text-white flex items-center gap-1.5 transition-colors">
+            <a href={`/${locale}/admin/categorias`} className="text-white/80 hover:text-white flex items-center gap-1.5 transition-colors">
+              <Tag className="w-4 h-4" />
+              Categorías
+            </a>
+            <a href={`/${locale}/admin#orders`} className="text-white/80 hover:text-white flex items-center gap-1.5 transition-colors">
               <ShoppingBag className="w-4 h-4" />
               {t("orders")}
             </a>

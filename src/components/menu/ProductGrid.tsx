@@ -1,14 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Product, Category } from "@/lib/types";
+import type { CategoryRow, Product } from "@/lib/types";
 import { CATEGORY_ORDER } from "@/lib/types";
 import { useCartStore } from "@/store/cart";
 import { Plus, Check } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Props {
   products: Product[];
+  categories: CategoryRow[];
   locale: string;
 }
 
@@ -61,9 +62,7 @@ function ProductCard({ product, locale }: { product: Product; locale: string }) 
 
       <div className="p-6">
         <h3 className="font-black text-2xl mb-2 leading-tight">{name}</h3>
-        <p className="text-gray-500 text-sm leading-relaxed mb-5 line-clamp-3">
-          {description}
-        </p>
+        <p className="text-gray-500 text-sm leading-relaxed mb-5 line-clamp-3">{description}</p>
         {product.available && hasPrice ? (
           <button
             onClick={handleAdd}
@@ -100,20 +99,20 @@ function ProductCard({ product, locale }: { product: Product; locale: string }) 
 }
 
 function CategorySection({
-  category,
+  slug,
   products,
   locale,
   title,
   emptyLabel,
 }: {
-  category: Category;
+  slug: string;
   products: Product[];
   locale: string;
   title: string;
   emptyLabel: string;
 }) {
   return (
-    <section id={`cat-${category}`} className="scroll-mt-24">
+    <section id={`cat-${slug}`} className="scroll-mt-24">
       <div className="flex items-center gap-4 mb-8">
         <h2 className="font-black text-3xl md:text-4xl" style={{ color: "#8b0031" }}>
           {title}
@@ -135,13 +134,13 @@ function CategorySection({
   );
 }
 
-function useActiveCategory() {
-  const [active, setActive] = useState<Category | null>(null);
+function useActiveCategory(slugs: string[]) {
+  const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
-    const sections = CATEGORY_ORDER.map((c) => document.getElementById(`cat-${c}`)).filter(
-      (el): el is HTMLElement => !!el,
-    );
+    const sections = slugs
+      .map((s) => document.getElementById(`cat-${s}`))
+      .filter((el): el is HTMLElement => !!el);
     if (sections.length === 0) return;
 
     const observer = new IntersectionObserver(
@@ -149,54 +148,65 @@ function useActiveCategory() {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (visible) {
-          const id = visible.target.id.replace(/^cat-/, "") as Category;
-          setActive(id);
-        }
+        if (visible) setActive(visible.target.id.replace(/^cat-/, ""));
       },
       { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
     );
     sections.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [slugs]);
 
   return active;
 }
 
-export default function ProductGrid({ products, locale }: Props) {
+export default function ProductGrid({ products, categories, locale }: Props) {
   const t = useTranslations("menu");
-  const tCat = useTranslations("categories");
-  const active = useActiveCategory();
+  const tFallback = useTranslations("categories");
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Keep the active chip in view within the horizontally-scrolling nav on mobile.
+  // If DB categories are provided, use them. Otherwise fall back to the legacy
+  // hardcoded list (keeps the mock-data/dev path working).
+  const displayCategories = useMemo(() => {
+    if (categories.length > 0) return [...categories].sort((a, b) => a.display_order - b.display_order);
+    return CATEGORY_ORDER.map((slug, i) => ({
+      slug,
+      label_es: tFallback(slug),
+      label_en: tFallback(slug),
+      kind: "menu" as const,
+      display_order: i,
+    }));
+  }, [categories, tFallback]);
+
+  const slugs = useMemo(() => displayCategories.map((c) => c.slug), [displayCategories]);
+  const active = useActiveCategory(slugs);
+
   useEffect(() => {
     if (!active || !navRef.current) return;
     const el = navRef.current.querySelector<HTMLAnchorElement>(`a[data-cat="${active}"]`);
     el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [active]);
 
-  const byCategory = new Map<Category, Product[]>();
-  for (const cat of CATEGORY_ORDER) byCategory.set(cat, []);
+  const byCategory = new Map<string, Product[]>();
+  for (const c of displayCategories) byCategory.set(c.slug, []);
   for (const p of products) {
     if (byCategory.has(p.category)) byCategory.get(p.category)!.push(p);
   }
 
   return (
     <div className="space-y-20">
-      {/* Sticky category nav — always visible while scrolling the menu. */}
       <nav className="sticky top-16 z-30 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div
           ref={navRef}
           className="flex gap-2 overflow-x-auto no-scrollbar justify-start md:justify-center max-w-6xl mx-auto"
         >
-          {CATEGORY_ORDER.map((cat) => {
-            const isActive = active === cat;
+          {displayCategories.map((c) => {
+            const isActive = active === c.slug;
+            const label = locale === "en" ? c.label_en : c.label_es;
             return (
               <a
-                key={cat}
-                href={`#cat-${cat}`}
-                data-cat={cat}
+                key={c.slug}
+                href={`#cat-${c.slug}`}
+                data-cat={c.slug}
                 className="px-4 py-2 rounded-full border text-sm font-semibold whitespace-nowrap transition-colors"
                 style={{
                   borderColor: isActive ? "#8b0031" : "#e5e7eb",
@@ -204,20 +214,22 @@ export default function ProductGrid({ products, locale }: Props) {
                   color: isActive ? "#ffffff" : "#8b0031",
                 }}
               >
-                {tCat(cat)}
+                {label}
               </a>
             );
           })}
         </div>
       </nav>
 
-      {CATEGORY_ORDER.map((cat) => (
+      {displayCategories.map((c) => (
         <CategorySection
-          key={cat}
-          category={cat}
-          products={byCategory.get(cat)!.sort((a, b) => a.display_order - b.display_order)}
+          key={c.slug}
+          slug={c.slug}
+          products={(byCategory.get(c.slug) ?? []).sort(
+            (a, b) => a.display_order - b.display_order,
+          )}
           locale={locale}
-          title={tCat(cat)}
+          title={locale === "en" ? c.label_en : c.label_es}
           emptyLabel={t("coming_soon")}
         />
       ))}
