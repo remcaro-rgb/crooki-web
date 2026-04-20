@@ -14,7 +14,20 @@ async function getProducts(): Promise<Product[]> {
       .from("products")
       .select("*, product_images(*)")
       .order("display_order");
-    return data || mockProducts;
+
+    // If the DB hasn't been migrated + re-seeded with the docx catalog yet
+    // (rows missing `category`, or only the old galletas seed), fall back to
+    // the mock catalog so every category has its products visible.
+    const dbReady =
+      Array.isArray(data) &&
+      data.length > 0 &&
+      data.every((row) => typeof (row as Product).category === "string");
+    if (!dbReady) return mockProducts;
+
+    const categoriesPresent = new Set((data as Product[]).map((r) => r.category));
+    if (categoriesPresent.size < 2) return mockProducts;
+
+    return data as Product[];
   } catch {
     return mockProducts;
   }

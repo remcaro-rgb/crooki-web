@@ -25,6 +25,7 @@ export default function Header({ locale }: { locale: string }) {
   const navLinks = [
     { href: "/", label: t("home") },
     { href: "/menu", label: t("menu") },
+    { href: "/merch", label: t("merch") },
   ];
 
   const switchLocale = (newLocale: string) => {
