@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Minus, Plus, Loader2 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import type { ComboSelection, Product } from "@/lib/types";
@@ -108,10 +109,32 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
 
   const T = (es: string, en: string) => (locale === "en" ? en : es);
 
-  return (
+  // The product card has a `hover:-translate-y-2` transform, which creates a
+  // containing block for `position: fixed` descendants. Without a portal the
+  // modal would render relative to the card — appearing as a tiny box and
+  // jumping to viewport coordinates when hover ends. Portal to <body> escapes
+  // the transform context. Lock body scroll while the modal is open.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  const overlay = (
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60"
-      onClick={onClose}
+      onClick={(e) => {
+        // Only close on direct backdrop clicks — prevents stray bubbled clicks
+        // (e.g. from the trigger button rendered behind in DOM order) from
+        // immediately dismissing the modal.
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div
         className="bg-white w-full max-w-xl max-h-[90vh] rounded-t-3xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl"
@@ -311,4 +334,6 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
       </div>
     </div>
   );
+
+  return createPortal(overlay, document.body);
 }
