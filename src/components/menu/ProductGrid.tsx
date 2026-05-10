@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/cart";
 import { Plus, Check, Settings2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ComboConfigurator from "./ComboConfigurator";
+import BoxConfigurator from "./BoxConfigurator";
 
 interface Props {
   products: Product[];
@@ -29,6 +30,8 @@ function ProductCard({
   const [configuring, setConfiguring] = useState(false);
 
   const isCombo = product.category === "combos";
+  const isBox = product.category === "cajas";
+  const isConfigurable = isCombo || isBox;
 
   const name = locale === "en" ? product.name_en : product.name_es;
   const description = locale === "en" ? product.description_en : product.description_es;
@@ -37,7 +40,7 @@ function ProductCard({
     `/images/${product.id.toLowerCase().replace(/\s+/g, "-")}.jpg`;
 
   const handleAdd = () => {
-    if (isCombo) {
+    if (isConfigurable) {
       setConfiguring(true);
       return;
     }
@@ -90,7 +93,7 @@ function ProductCard({
                 <Check className="w-5 h-5" />
                 {locale === "en" ? "Added!" : "¡Agregado!"}
               </>
-            ) : isCombo ? (
+            ) : isConfigurable ? (
               <>
                 <Settings2 className="w-5 h-5" />
                 {locale === "en" ? "Configure" : "Personalizar"}
@@ -116,9 +119,17 @@ function ProductCard({
         )}
       </div>
 
-      {configuring && (
+      {configuring && isCombo && (
         <ComboConfigurator
           combo={product}
+          productsById={productsById}
+          locale={locale}
+          onClose={() => setConfiguring(false)}
+        />
+      )}
+      {configuring && isBox && (
+        <BoxConfigurator
+          box={product}
           productsById={productsById}
           locale={locale}
           onClose={() => setConfiguring(false)}

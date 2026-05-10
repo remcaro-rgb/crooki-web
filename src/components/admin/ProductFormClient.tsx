@@ -81,10 +81,48 @@ export default function ProductFormClient({
   });
 
   const isCombo = form.category === "combos";
+  const isBox = form.category === "cajas";
 
   const [includesSalsa, setIncludesSalsa] = useState<boolean>(
     product?.includes_salsa ?? false,
   );
+
+  // Box-specific state
+  const [boxCookieCount, setBoxCookieCount] = useState<string>(
+    product?.box_cookie_count?.toString() ?? "2",
+  );
+  const [giftCardPrice, setGiftCardPrice] = useState<string>(
+    product?.gift_card_price != null ? String(product.gift_card_price) : "",
+  );
+  const [giftCardCakePrice, setGiftCardCakePrice] = useState<string>(
+    product?.gift_card_cake_price != null ? String(product.gift_card_cake_price) : "",
+  );
+
+  // Box cookie picker shares the same shape as the combo picker but reads its
+  // initial state from `product.box_cookies`.
+  const [boxCookiePicker, setBoxCookiePicker] = useState<Record<string, ComboPickerEntry>>(() => {
+    const out: Record<string, ComboPickerEntry> = {};
+    for (const g of allGalletas) {
+      const existing = product?.box_cookies?.find((bc) => bc.cookie_id === g.id);
+      out[g.id] = {
+        selected: !!existing,
+        extra: existing ? String(existing.extra_price) : "0",
+      };
+    }
+    return out;
+  });
+
+  const toggleBoxCookie = (id: string) =>
+    setBoxCookiePicker((p) => {
+      const cur = p[id] ?? { selected: false, extra: "0" };
+      return { ...p, [id]: { ...cur, selected: !cur.selected } };
+    });
+
+  const setBoxCookieExtra = (id: string, value: string) =>
+    setBoxCookiePicker((p) => ({
+      ...p,
+      [id]: { ...(p[id] ?? { selected: true, extra: "0" }), extra: value },
+    }));
 
   // Map of product-id → { selected, extra-price string } for the cookie picker.
   const [cookiePicker, setCookiePicker] = useState<Record<string, ComboPickerEntry>>(() => {
@@ -197,7 +235,7 @@ export default function ProductFormClient({
 
     try {
       const supabase = createClient();
-      const productData = {
+      const productData: Record<string, unknown> = {
         name_es: form.name_es,
         name_en: form.name_en,
         description_es: form.description_es,
@@ -209,6 +247,14 @@ export default function ProductFormClient({
         // Only meaningful for combos; harmless for other categories.
         includes_salsa: isCombo ? includesSalsa : false,
       };
+      if (isBox) {
+        const count = parseInt(boxCookieCount, 10);
+        productData.box_cookie_count = Number.isFinite(count) && count >= 2 ? count : 2;
+        productData.gift_card_price =
+          giftCardPrice.trim() === "" ? null : parseFloat(giftCardPrice) || 0;
+        productData.gift_card_cake_price =
+          giftCardCakePrice.trim() === "" ? null : parseFloat(giftCardCakePrice) || 0;
+      }
 
       let productId = product?.id;
 
@@ -264,6 +310,22 @@ export default function ProductFormClient({
         if (salsaRows.length > 0) {
           const { error: csErr } = await supabase.from("combo_salsas").insert(salsaRows);
           if (csErr) throw csErr;
+        }
+      }
+
+      if (isBox && productId) {
+        await supabase.from("box_cookies").delete().eq("box_id", productId);
+        const boxRows = Object.entries(boxCookiePicker)
+          .filter(([, v]) => v.selected)
+          .map(([cookieId, v], idx) => ({
+            box_id: productId,
+            cookie_id: cookieId,
+            extra_price: parseFloat(v.extra) || 0,
+            display_order: idx,
+          }));
+        if (boxRows.length > 0) {
+          const { error: bcErr } = await supabase.from("box_cookies").insert(boxRows);
+          if (bcErr) throw bcErr;
         }
       }
 
@@ -666,6 +728,117 @@ export default function ProductFormClient({
                             type="number"
                             value={entry.extra}
                             onChange={(e) => setSalsaExtra(s.id, e.target.value)}
+                            disabled={!entry.selected}
+                            min="0"
+                            step="100"
+                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-right disabled:bg-gray-50 disabled:text-gray-300"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Cajas configuration — only when category=cajas */}
+        {isBox && (
+          <div className="rounded-2xl border border-gray-200 p-6 flex flex-col gap-6 bg-gray-50/50">
+            <div>
+              <h2 className="text-lg font-black mb-1" style={{ color: "#8b0031" }}>
+                Configuración de la Caja
+              </h2>
+              <p className="text-sm text-gray-500">
+                Define cuántas galletas trae la caja, qué galletas el cliente puede elegir
+                y los add-ons opcionales (gift card, gift card + torta).
+              </p>
+            </div>
+
+            {/* Cantidad de galletas */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">
+                  Cantidad de galletas *
+                </label>
+                <input
+                  type="number"
+                  value={boxCookieCount}
+                  onChange={(e) => setBoxCookieCount(e.target.value)}
+                  min={2}
+                  step={1}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 transition-all"
+                  required
+                />
+                <p className="text-xs text-gray-400 mt-1">Mínimo 2.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">
+                  Precio Gift Card (opcional)
+                </label>
+                <input
+                  type="number"
+                  value={giftCardPrice}
+                  onChange={(e) => setGiftCardPrice(e.target.value)}
+                  min={0}
+                  step="100"
+                  placeholder="dejar vacío para no ofrecer"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">
+                  Precio Gift Card + Torta (opcional)
+                </label>
+                <input
+                  type="number"
+                  value={giftCardCakePrice}
+                  onChange={(e) => setGiftCardCakePrice(e.target.value)}
+                  min={0}
+                  step="100"
+                  placeholder="dejar vacío para no ofrecer"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Cookie picker */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                Galletas disponibles
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                El cliente elegirá {boxCookieCount || "N"} galletas (puede repetir sabores).
+                Marca las elegibles y opcionalmente un precio extra por sabor.
+              </p>
+              {allGalletas.length === 0 ? (
+                <div className="text-sm text-gray-400">No hay galletas en el catálogo.</div>
+              ) : (
+                <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+                  {allGalletas.map((g) => {
+                    const entry = boxCookiePicker[g.id] ?? { selected: false, extra: "0" };
+                    return (
+                      <div key={g.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <input
+                          type="checkbox"
+                          checked={entry.selected}
+                          onChange={() => toggleBoxCookie(g.id)}
+                          className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                          style={{ accentColor: "#8b0031" }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{g.name_es}</p>
+                          <p className="text-xs text-gray-400">
+                            Precio base: ${g.price.toLocaleString("es-CO")}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">+ $</span>
+                          <input
+                            type="number"
+                            value={entry.extra}
+                            onChange={(e) => setBoxCookieExtra(g.id, e.target.value)}
                             disabled={!entry.selected}
                             min="0"
                             step="100"

@@ -86,6 +86,15 @@ export default function CheckoutClient({ locale }: Props) {
             parts.push(`${extra.quantity}× ${extra.salsaName}`);
           }
           productName = `${baseName} · ${parts.join(" + ")}`;
+        } else if (item.box) {
+          const cookieParts = item.box.cookies.map((c) => `${c.quantity}× ${c.cookieName}`);
+          const giftSuffix =
+            item.box.giftCard === "card"
+              ? " · Gift card"
+              : item.box.giftCard === "card_and_cake"
+                ? " · Gift card + torta"
+                : "";
+          productName = `${baseName} · ${cookieParts.join(" + ")}${giftSuffix}`;
         }
         return {
           order_id: order.id,
@@ -265,7 +274,7 @@ export default function CheckoutClient({ locale }: Props) {
 
               <div className="flex flex-col gap-3 mb-5">
                 {items.map((item) => {
-                  const { product, quantity, lineId, combo, unitPrice } = item;
+                  const { product, quantity, lineId, combo, box, unitPrice } = item;
                   const name = locale === "en" ? product.name_en : product.name_es;
                   const linePrice = unitPrice ?? product.price;
                   return (
@@ -286,6 +295,13 @@ export default function CheckoutClient({ locale }: Props) {
                                 combo.additionalSalsas
                                   .map((a) => `${a.quantity}× ${a.salsaName}`)
                                   .join(", ")}
+                          </div>
+                        )}
+                        {box && (
+                          <div className="text-xs text-gray-400 mt-0.5">
+                            {box.cookies.map((c) => `${c.quantity}× ${c.cookieName}`).join(", ")}
+                            {box.giftCard === "card" && " · Gift card"}
+                            {box.giftCard === "card_and_cake" && " · Gift card + torta"}
                           </div>
                         )}
                       </div>

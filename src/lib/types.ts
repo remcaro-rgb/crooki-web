@@ -51,6 +51,13 @@ export interface Product {
   includes_salsa?: boolean;
   combo_cookies?: ComboCookieRow[];
   combo_salsas?: ComboSalsaRow[];
+  // Box-specific fields. Meaningful only when category === 'cajas'.
+  // `box_cookie_count` is the exact number of cookies the customer must pick.
+  // The two gift-card prices are nullable; null = that add-on isn't offered.
+  box_cookie_count?: number;
+  gift_card_price?: number | null;
+  gift_card_cake_price?: number | null;
+  box_cookies?: BoxCookieRow[];
 }
 
 export interface ComboCookieRow {
@@ -67,6 +74,27 @@ export interface ComboSalsaRow {
   salsa_id: string;
   extra_price: number;
   display_order: number;
+}
+
+export interface BoxCookieRow {
+  id: string;
+  box_id: string;
+  cookie_id: string;
+  extra_price: number;
+  display_order: number;
+}
+
+export type GiftCardChoice = "none" | "card" | "card_and_cake";
+
+export interface BoxSelection {
+  cookies: Array<{
+    cookieId: string;
+    cookieName: string;
+    quantity: number;
+    extraPrice: number;
+  }>;
+  giftCard: GiftCardChoice;
+  giftCardPrice: number; // 0 when giftCard === 'none'
 }
 
 // Customer's combo configuration captured in the cart.
@@ -87,11 +115,12 @@ export interface ComboSelection {
 export interface CartItem {
   product: Product;
   quantity: number;
-  // Stable identifier — required for combos so two same-product cart lines with
-  // different selections don't collapse. For non-combo products this equals
-  // `product.id`.
+  // Stable identifier — required for combos and boxes so two same-product cart
+  // lines with different selections don't collapse. For plain products this
+  // equals `product.id`.
   lineId: string;
   combo?: ComboSelection;
+  box?: BoxSelection;
   // Per-unit price including all customization extras. Falls back to
   // `product.price` if absent.
   unitPrice?: number;

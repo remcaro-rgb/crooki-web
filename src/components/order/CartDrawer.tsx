@@ -67,7 +67,7 @@ export default function CartDrawer() {
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((item) => {
-                const { product, quantity, lineId, combo, unitPrice } = item;
+                const { product, quantity, lineId, combo, box, unitPrice } = item;
                 const name = locale === "en" ? product.name_en : product.name_es;
                 const imageUrl =
                   product.product_images?.[0]?.url ||
@@ -105,6 +105,28 @@ export default function CartDrawer() {
                               · +{a.quantity}× {a.salsaName}
                             </li>
                           ))}
+                        </ul>
+                      )}
+
+                      {box && (
+                        <ul className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+                          {box.cookies.map((c) => (
+                            <li key={c.cookieId}>
+                              · {c.quantity}× {c.cookieName}
+                            </li>
+                          ))}
+                          {box.giftCard !== "none" && (
+                            <li>
+                              ·{" "}
+                              {box.giftCard === "card"
+                                ? locale === "en"
+                                  ? "Gift card"
+                                  : "Gift card"
+                                : locale === "en"
+                                  ? "Gift card + birthday cake"
+                                  : "Gift card + torta"}
+                            </li>
+                          )}
                         </ul>
                       )}
 
