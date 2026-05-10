@@ -4,7 +4,6 @@ import { useCartStore } from "@/store/cart";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { X, ShoppingBag, Minus, Plus, Trash2 } from "lucide-react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
@@ -67,15 +66,17 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {items.map(({ product, quantity }) => {
+              {items.map((item) => {
+                const { product, quantity, lineId, combo, unitPrice } = item;
                 const name = locale === "en" ? product.name_en : product.name_es;
                 const imageUrl =
                   product.product_images?.[0]?.url ||
                   `/images/${product.id}.jpg`;
+                const linePrice = unitPrice ?? product.price;
 
                 return (
                   <div
-                    key={product.id}
+                    key={lineId}
                     className="flex gap-3 items-start pb-4 border-b border-gray-100 last:border-0"
                   >
                     {/* Image */}
@@ -92,14 +93,29 @@ export default function CartDrawer() {
                       <p className="font-semibold text-sm leading-tight truncate">
                         {name}
                       </p>
+
+                      {combo && (
+                        <ul className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+                          <li>· {combo.cookieName}</li>
+                          {combo.includedSalsaName && (
+                            <li>· {locale === "en" ? "Sauce" : "Salsa"}: {combo.includedSalsaName}</li>
+                          )}
+                          {combo.additionalSalsas.map((a) => (
+                            <li key={a.salsaId}>
+                              · +{a.quantity}× {a.salsaName}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
                       <p className="text-sm font-bold mt-1" style={{ color: "#8b0031" }}>
-                        ${product.price.toLocaleString()}
+                        ${linePrice.toLocaleString()}
                       </p>
 
                       {/* Quantity controls */}
                       <div className="flex items-center gap-2 mt-2">
                         <button
-                          onClick={() => updateQuantity(product.id, quantity - 1)}
+                          onClick={() => updateQuantity(lineId, quantity - 1)}
                           className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors"
                         >
                           <Minus className="w-3 h-3" />
@@ -108,7 +124,7 @@ export default function CartDrawer() {
                           {quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(product.id, quantity + 1)}
+                          onClick={() => updateQuantity(lineId, quantity + 1)}
                           className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors"
                         >
                           <Plus className="w-3 h-3" />
@@ -118,7 +134,7 @@ export default function CartDrawer() {
 
                     {/* Remove */}
                     <button
-                      onClick={() => removeItem(product.id)}
+                      onClick={() => removeItem(lineId)}
                       className="p-1 hover:text-red-600 transition-colors text-gray-400"
                     >
                       <Trash2 className="w-4 h-4" />

@@ -11,9 +11,30 @@ export default async function EditProductPage({
   const { locale, id } = await params;
   const { supabase } = await requireAdmin(locale);
 
-  const [{ data: product }, { data: categories }] = await Promise.all([
-    supabase.from("products").select("*, product_images(*)").eq("id", id).single(),
+  const [
+    { data: product },
+    { data: categories },
+    { data: galletas },
+    { data: salsas },
+  ] = await Promise.all([
+    supabase
+      .from("products")
+      .select(
+        "*, product_images(*), combo_cookies!combo_cookies_combo_id_fkey(*), combo_salsas!combo_salsas_combo_id_fkey(*)",
+      )
+      .eq("id", id)
+      .single(),
     supabase.from("categories").select("*").order("kind").order("display_order"),
+    supabase
+      .from("products")
+      .select("id, name_es, name_en, price")
+      .eq("category", "galletas")
+      .order("display_order"),
+    supabase
+      .from("products")
+      .select("id, name_es, name_en, price")
+      .eq("category", "salsas")
+      .order("display_order"),
   ]);
 
   if (!product) notFound();
@@ -24,6 +45,8 @@ export default async function EditProductPage({
       mode="edit"
       product={product as Product}
       categories={(categories as CategoryRow[]) ?? []}
+      allGalletas={galletas ?? []}
+      allSalsas={salsas ?? []}
     />
   );
 }

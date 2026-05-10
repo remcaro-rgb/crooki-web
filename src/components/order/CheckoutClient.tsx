@@ -74,13 +74,27 @@ export default function CheckoutClient({ locale }: Props) {
       if (orderError) throw orderError;
 
       // Insert order items
-      const orderItems = items.map((item) => ({
-        order_id: order.id,
-        product_id: item.product.id,
-        quantity: item.quantity,
-        unit_price: item.product.price,
-        product_name: locale === "en" ? item.product.name_en : item.product.name_es,
-      }));
+      const orderItems = items.map((item) => {
+        const baseName = locale === "en" ? item.product.name_en : item.product.name_es;
+        let productName = baseName;
+        if (item.combo) {
+          const parts: string[] = [item.combo.cookieName];
+          if (item.combo.includedSalsaName) {
+            parts.push(`Salsa ${item.combo.includedSalsaName}`);
+          }
+          for (const extra of item.combo.additionalSalsas) {
+            parts.push(`${extra.quantity}× ${extra.salsaName}`);
+          }
+          productName = `${baseName} · ${parts.join(" + ")}`;
+        }
+        return {
+          order_id: order.id,
+          product_id: item.product.id,
+          quantity: item.quantity,
+          unit_price: item.unitPrice ?? item.product.price,
+          product_name: productName,
+        };
+      });
 
       const { error: itemsError } = await supabase
         .from("order_items")
@@ -250,20 +264,33 @@ export default function CheckoutClient({ locale }: Props) {
               </h2>
 
               <div className="flex flex-col gap-3 mb-5">
-                {items.map(({ product, quantity }) => {
-                  const name =
-                    locale === "en" ? product.name_en : product.name_es;
+                {items.map((item) => {
+                  const { product, quantity, lineId, combo, unitPrice } = item;
+                  const name = locale === "en" ? product.name_en : product.name_es;
+                  const linePrice = unitPrice ?? product.price;
                   return (
                     <div
-                      key={product.id}
+                      key={lineId}
                       className="flex justify-between items-start gap-2 text-sm"
                     >
-                      <span className="text-gray-700 leading-tight">
-                        {name}{" "}
-                        <span className="text-gray-400">x{quantity}</span>
-                      </span>
+                      <div className="text-gray-700 leading-tight min-w-0">
+                        <div>
+                          {name} <span className="text-gray-400">x{quantity}</span>
+                        </div>
+                        {combo && (
+                          <div className="text-xs text-gray-400 mt-0.5">
+                            {combo.cookieName}
+                            {combo.includedSalsaName && ` · ${combo.includedSalsaName}`}
+                            {combo.additionalSalsas.length > 0 &&
+                              ` · ` +
+                                combo.additionalSalsas
+                                  .map((a) => `${a.quantity}× ${a.salsaName}`)
+                                  .join(", ")}
+                          </div>
+                        )}
+                      </div>
                       <span className="font-semibold flex-shrink-0">
-                        ${(product.price * quantity).toLocaleString()}
+                        ${(linePrice * quantity).toLocaleString()}
                       </span>
                     </div>
                   );

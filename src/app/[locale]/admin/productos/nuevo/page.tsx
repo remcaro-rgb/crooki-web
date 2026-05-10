@@ -13,11 +13,19 @@ export default async function NewProductPage({
   const { supabase } = await requireAdmin(locale);
   const { kind, category } = await searchParams;
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("*")
-    .order("kind")
-    .order("display_order");
+  const [{ data: categories }, { data: galletas }, { data: salsas }] = await Promise.all([
+    supabase.from("categories").select("*").order("kind").order("display_order"),
+    supabase
+      .from("products")
+      .select("id, name_es, name_en, price")
+      .eq("category", "galletas")
+      .order("display_order"),
+    supabase
+      .from("products")
+      .select("id, name_es, name_en, price")
+      .eq("category", "salsas")
+      .order("display_order"),
+  ]);
 
   return (
     <ProductFormClient
@@ -26,6 +34,8 @@ export default async function NewProductPage({
       categories={(categories as CategoryRow[]) ?? []}
       initialKind={kind === "merch" ? "merch" : "menu"}
       initialCategory={category}
+      allGalletas={galletas ?? []}
+      allSalsas={salsas ?? []}
     />
   );
 }

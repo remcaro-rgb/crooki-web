@@ -18,7 +18,9 @@ async function loadCatalog(): Promise<{ categories: CategoryRow[]; products: Pro
         .order("display_order"),
       supabase
         .from("products")
-        .select("*, product_images(*)")
+        .select(
+          "*, product_images(*), combo_cookies!combo_cookies_combo_id_fkey(*), combo_salsas!combo_salsas_combo_id_fkey(*)",
+        )
         .order("display_order"),
     ]);
     return {

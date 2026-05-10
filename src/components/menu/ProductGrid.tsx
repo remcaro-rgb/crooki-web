@@ -4,8 +4,9 @@ import { useTranslations } from "next-intl";
 import type { CategoryRow, Product } from "@/lib/types";
 import { CATEGORY_ORDER } from "@/lib/types";
 import { useCartStore } from "@/store/cart";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Settings2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ComboConfigurator from "./ComboConfigurator";
 
 interface Props {
   products: Product[];
@@ -13,10 +14,21 @@ interface Props {
   locale: string;
 }
 
-function ProductCard({ product, locale }: { product: Product; locale: string }) {
+function ProductCard({
+  product,
+  locale,
+  productsById,
+}: {
+  product: Product;
+  locale: string;
+  productsById: Map<string, Product>;
+}) {
   const t = useTranslations("menu");
   const { addItem } = useCartStore();
   const [added, setAdded] = useState(false);
+  const [configuring, setConfiguring] = useState(false);
+
+  const isCombo = product.category === "combos";
 
   const name = locale === "en" ? product.name_en : product.name_es;
   const description = locale === "en" ? product.description_en : product.description_es;
@@ -25,6 +37,10 @@ function ProductCard({ product, locale }: { product: Product; locale: string }) 
     `/images/${product.id.toLowerCase().replace(/\s+/g, "-")}.jpg`;
 
   const handleAdd = () => {
+    if (isCombo) {
+      setConfiguring(true);
+      return;
+    }
     addItem(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -74,6 +90,11 @@ function ProductCard({ product, locale }: { product: Product; locale: string }) 
                 <Check className="w-5 h-5" />
                 {locale === "en" ? "Added!" : "¡Agregado!"}
               </>
+            ) : isCombo ? (
+              <>
+                <Settings2 className="w-5 h-5" />
+                {locale === "en" ? "Configure" : "Personalizar"}
+              </>
             ) : (
               <>
                 <Plus className="w-5 h-5" />
@@ -94,6 +115,15 @@ function ProductCard({ product, locale }: { product: Product; locale: string }) 
           </button>
         )}
       </div>
+
+      {configuring && (
+        <ComboConfigurator
+          combo={product}
+          productsById={productsById}
+          locale={locale}
+          onClose={() => setConfiguring(false)}
+        />
+      )}
     </div>
   );
 }
@@ -104,12 +134,14 @@ function CategorySection({
   locale,
   title,
   emptyLabel,
+  productsById,
 }: {
   slug: string;
   products: Product[];
   locale: string;
   title: string;
   emptyLabel: string;
+  productsById: Map<string, Product>;
 }) {
   return (
     <section id={`cat-${slug}`} className="scroll-mt-24">
@@ -126,7 +158,12 @@ function CategorySection({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} locale={locale} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              locale={locale}
+              productsById={productsById}
+            />
           ))}
         </div>
       )}
@@ -192,6 +229,12 @@ export default function ProductGrid({ products, categories, locale }: Props) {
     if (byCategory.has(p.category)) byCategory.get(p.category)!.push(p);
   }
 
+  const productsById = useMemo(() => {
+    const m = new Map<string, Product>();
+    for (const p of products) m.set(p.id, p);
+    return m;
+  }, [products]);
+
   return (
     <div className="space-y-20">
       <nav className="sticky top-16 z-30 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -231,6 +274,7 @@ export default function ProductGrid({ products, categories, locale }: Props) {
           locale={locale}
           title={locale === "en" ? c.label_en : c.label_es}
           emptyLabel={t("coming_soon")}
+          productsById={productsById}
         />
       ))}
     </div>

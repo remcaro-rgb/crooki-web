@@ -8,6 +8,13 @@ import { Loader2, Upload, X, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { CategoryKind, CategoryRow, Product } from "@/lib/types";
 
+interface ReferenceProduct {
+  id: string;
+  name_es: string;
+  name_en: string;
+  price: number;
+}
+
 interface Props {
   locale: string;
   mode: "create" | "edit";
@@ -15,6 +22,15 @@ interface Props {
   categories: CategoryRow[];
   initialKind?: CategoryKind;
   initialCategory?: string;
+  // Catalog of cookies/salsas the admin may include in a combo. Server pages
+  // pass the full lists; we render checkboxes + per-row extra-price inputs.
+  allGalletas?: ReferenceProduct[];
+  allSalsas?: ReferenceProduct[];
+}
+
+interface ComboPickerEntry {
+  selected: boolean;
+  extra: string;
 }
 
 export default function ProductFormClient({
@@ -24,6 +40,8 @@ export default function ProductFormClient({
   categories,
   initialKind = "menu",
   initialCategory,
+  allGalletas = [],
+  allSalsas = [],
 }: Props) {
   const t = useTranslations("admin");
   const router = useRouter();
@@ -61,6 +79,58 @@ export default function ProductFormClient({
     available: product?.available ?? true,
     display_order: product?.display_order?.toString() ?? "0",
   });
+
+  const isCombo = form.category === "combos";
+
+  const [includesSalsa, setIncludesSalsa] = useState<boolean>(
+    product?.includes_salsa ?? false,
+  );
+
+  // Map of product-id → { selected, extra-price string } for the cookie picker.
+  const [cookiePicker, setCookiePicker] = useState<Record<string, ComboPickerEntry>>(() => {
+    const out: Record<string, ComboPickerEntry> = {};
+    for (const g of allGalletas) {
+      const existing = product?.combo_cookies?.find((cc) => cc.cookie_id === g.id);
+      out[g.id] = {
+        selected: !!existing,
+        extra: existing ? String(existing.extra_price) : "0",
+      };
+    }
+    return out;
+  });
+
+  // Map of product-id → { selected, extra-price string } for the salsa picker.
+  // When a salsa is checked for the first time, default extra = salsa's own
+  // price (per spec: "take by default the price of the Salsa").
+  const [salsaPicker, setSalsaPicker] = useState<Record<string, ComboPickerEntry>>(() => {
+    const out: Record<string, ComboPickerEntry> = {};
+    for (const s of allSalsas) {
+      const existing = product?.combo_salsas?.find((cs) => cs.salsa_id === s.id);
+      out[s.id] = {
+        selected: !!existing,
+        extra: existing ? String(existing.extra_price) : String(s.price),
+      };
+    }
+    return out;
+  });
+
+  const toggleCookie = (id: string, defaultExtra = "0") =>
+    setCookiePicker((p) => {
+      const cur = p[id] ?? { selected: false, extra: defaultExtra };
+      return { ...p, [id]: { ...cur, selected: !cur.selected } };
+    });
+
+  const setCookieExtra = (id: string, value: string) =>
+    setCookiePicker((p) => ({ ...p, [id]: { ...(p[id] ?? { selected: true, extra: "0" }), extra: value } }));
+
+  const toggleSalsa = (id: string, defaultExtra: string) =>
+    setSalsaPicker((p) => {
+      const cur = p[id] ?? { selected: false, extra: defaultExtra };
+      return { ...p, [id]: { ...cur, selected: !cur.selected } };
+    });
+
+  const setSalsaExtra = (id: string, value: string) =>
+    setSalsaPicker((p) => ({ ...p, [id]: { ...(p[id] ?? { selected: true, extra: "0" }), extra: value } }));
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -136,6 +206,8 @@ export default function ProductFormClient({
         category: form.category,
         available: form.available,
         display_order: parseInt(form.display_order) || 0,
+        // Only meaningful for combos; harmless for other categories.
+        includes_salsa: isCombo ? includesSalsa : false,
       };
 
       let productId = product?.id;
@@ -160,6 +232,39 @@ export default function ProductFormClient({
         setUploadingImages(true);
         await uploadImages(productId);
         setUploadingImages(false);
+      }
+
+      // Persist combo configuration: replace-all strategy is simpler and safe
+      // since the rows are pure metadata with no foreign-key children.
+      if (isCombo && productId) {
+        await supabase.from("combo_cookies").delete().eq("combo_id", productId);
+        await supabase.from("combo_salsas").delete().eq("combo_id", productId);
+
+        const cookieRows = Object.entries(cookiePicker)
+          .filter(([, v]) => v.selected)
+          .map(([cookieId, v], idx) => ({
+            combo_id: productId,
+            cookie_id: cookieId,
+            extra_price: parseFloat(v.extra) || 0,
+            display_order: idx,
+          }));
+        if (cookieRows.length > 0) {
+          const { error: ccErr } = await supabase.from("combo_cookies").insert(cookieRows);
+          if (ccErr) throw ccErr;
+        }
+
+        const salsaRows = Object.entries(salsaPicker)
+          .filter(([, v]) => v.selected)
+          .map(([salsaId, v], idx) => ({
+            combo_id: productId,
+            salsa_id: salsaId,
+            extra_price: parseFloat(v.extra) || 0,
+            display_order: idx,
+          }));
+        if (salsaRows.length > 0) {
+          const { error: csErr } = await supabase.from("combo_salsas").insert(salsaRows);
+          if (csErr) throw csErr;
+        }
       }
 
       toast.success(mode === "create" ? "Producto creado exitosamente" : "Producto actualizado");
@@ -437,6 +542,144 @@ export default function ProductFormClient({
             onChange={handleFileSelect}
           />
         </div>
+
+        {/* Combo configuration — only when category=combos */}
+        {isCombo && (
+          <div className="rounded-2xl border border-gray-200 p-6 flex flex-col gap-6 bg-gray-50/50">
+            <div>
+              <h2 className="text-lg font-black mb-1" style={{ color: "#8b0031" }}>
+                Configuración del Combo
+              </h2>
+              <p className="text-sm text-gray-500">
+                Selecciona qué galletas y salsas el cliente puede elegir. Los precios extra
+                se suman al precio base del combo.
+              </p>
+            </div>
+
+            {/* Includes salsa toggle */}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={includesSalsa}
+                  onChange={(e) => setIncludesSalsa(e.target.checked)}
+                  className="sr-only"
+                />
+                <div
+                  className="w-12 h-6 rounded-full transition-colors"
+                  style={{ backgroundColor: includesSalsa ? "#8b0031" : "#d1d5db" }}
+                >
+                  <div
+                    className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                    style={{ transform: includesSalsa ? "translateX(26px)" : "translateX(2px)" }}
+                  />
+                </div>
+              </div>
+              <span className="text-sm font-semibold text-gray-700">
+                Incluye una salsa (el cliente elige una sin costo adicional)
+              </span>
+            </label>
+
+            {/* Cookie picker */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                Galletas disponibles
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                El cliente elegirá UNA. Marca las galletas elegibles y opcionalmente
+                un precio extra por sabor (ej: $3.000 por sabor premium).
+              </p>
+              {allGalletas.length === 0 ? (
+                <div className="text-sm text-gray-400">No hay galletas en el catálogo.</div>
+              ) : (
+                <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+                  {allGalletas.map((g) => {
+                    const entry = cookiePicker[g.id] ?? { selected: false, extra: "0" };
+                    return (
+                      <div key={g.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <input
+                          type="checkbox"
+                          checked={entry.selected}
+                          onChange={() => toggleCookie(g.id)}
+                          className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                          style={{ accentColor: "#8b0031" }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{g.name_es}</p>
+                          <p className="text-xs text-gray-400">
+                            Precio base: ${g.price.toLocaleString("es-CO")}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">+ $</span>
+                          <input
+                            type="number"
+                            value={entry.extra}
+                            onChange={(e) => setCookieExtra(g.id, e.target.value)}
+                            disabled={!entry.selected}
+                            min="0"
+                            step="100"
+                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-right disabled:bg-gray-50 disabled:text-gray-300"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Salsa picker */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                Salsas disponibles
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                Selecciona qué salsas el cliente puede agregar (y, si &ldquo;Incluye una salsa&rdquo;
+                está activo, también de las que puede elegir como salsa incluida).
+                Por defecto el precio extra es el precio mismo de la salsa.
+              </p>
+              {allSalsas.length === 0 ? (
+                <div className="text-sm text-gray-400">No hay salsas en el catálogo.</div>
+              ) : (
+                <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+                  {allSalsas.map((s) => {
+                    const entry = salsaPicker[s.id] ?? { selected: false, extra: String(s.price) };
+                    return (
+                      <div key={s.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <input
+                          type="checkbox"
+                          checked={entry.selected}
+                          onChange={() => toggleSalsa(s.id, String(s.price))}
+                          className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                          style={{ accentColor: "#8b0031" }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{s.name_es}</p>
+                          <p className="text-xs text-gray-400">
+                            Precio base: ${s.price.toLocaleString("es-CO")}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">+ $</span>
+                          <input
+                            type="number"
+                            value={entry.extra}
+                            onChange={(e) => setSalsaExtra(s.id, e.target.value)}
+                            disabled={!entry.selected}
+                            min="0"
+                            step="100"
+                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-right disabled:bg-gray-50 disabled:text-gray-300"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Submit */}
         <div className="flex gap-4 pt-2">

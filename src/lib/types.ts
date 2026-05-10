@@ -45,11 +45,56 @@ export interface Product {
   display_order: number;
   created_at: string;
   product_images: ProductImage[];
+  // Combo-specific fields. `includes_salsa` is meaningful only for combos.
+  // The two arrays are populated when the combo product is loaded with its
+  // configuration; they're optional everywhere else.
+  includes_salsa?: boolean;
+  combo_cookies?: ComboCookieRow[];
+  combo_salsas?: ComboSalsaRow[];
+}
+
+export interface ComboCookieRow {
+  id: string;
+  combo_id: string;
+  cookie_id: string;
+  extra_price: number;
+  display_order: number;
+}
+
+export interface ComboSalsaRow {
+  id: string;
+  combo_id: string;
+  salsa_id: string;
+  extra_price: number;
+  display_order: number;
+}
+
+// Customer's combo configuration captured in the cart.
+export interface ComboSelection {
+  cookieId: string;
+  cookieName: string;
+  cookieExtra: number;
+  includedSalsaId?: string;
+  includedSalsaName?: string;
+  additionalSalsas: Array<{
+    salsaId: string;
+    salsaName: string;
+    quantity: number;
+    extraPrice: number;
+  }>;
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  // Stable identifier — required for combos so two same-product cart lines with
+  // different selections don't collapse. For non-combo products this equals
+  // `product.id`.
+  lineId: string;
+  combo?: ComboSelection;
+  // Per-unit price including all customization extras. Falls back to
+  // `product.price` if absent.
+  unitPrice?: number;
 }
 
 export type OrderStatus = "pending" | "confirmed" | "delivered" | "cancelled";
