@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { CheckCircle2, Package, ArrowLeft, MessageCircle } from "lucide-react";
@@ -50,7 +50,11 @@ export default async function OrderConfirmationPage({
 }) {
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: "confirmation" });
-  const supabase = await createClient();
+  // Service-role client: the orders table is RLS-locked to authenticated
+  // reads, but the customer who just placed an anonymous order needs to see
+  // their own confirmation page. Their order id (a UUID, unguessable) is
+  // effectively the bearer token for that single page.
+  const supabase = await createAdminClient();
 
   const { data: order } = await supabase
     .from("orders")

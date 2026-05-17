@@ -56,25 +56,7 @@ export default function CheckoutClient({ locale }: Props) {
     try {
       const supabase = createClient();
 
-      // Create order
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          customer_name: form.name,
-          customer_email: form.email,
-          customer_phone: form.phone,
-          customer_address: form.address,
-          notes: form.notes,
-          total: totalAmount,
-          status: "pending",
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // Insert order items
-      const orderItems = items.map((item) => {
+      const rpcItems = items.map((item) => {
         const baseName = locale === "en" ? item.product.name_en : item.product.name_es;
         let productName = baseName;
         if (item.combo) {
@@ -97,22 +79,28 @@ export default function CheckoutClient({ locale }: Props) {
           productName = `${baseName} · ${cookieParts.join(" + ")}${giftSuffix}`;
         }
         return {
-          order_id: order.id,
           product_id: item.product.id,
+          product_name: productName,
           quantity: item.quantity,
           unit_price: item.unitPrice ?? item.product.price,
-          product_name: productName,
         };
       });
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
+      const { data: orderId, error: rpcError } = await supabase.rpc("create_public_order", {
+        p_customer_name: form.name,
+        p_customer_email: form.email,
+        p_customer_phone: form.phone,
+        p_customer_address: form.address,
+        p_notes: form.notes,
+        p_total: totalAmount,
+        p_items: rpcItems,
+      });
 
-      if (itemsError) throw itemsError;
+      if (rpcError) throw rpcError;
+      if (!orderId) throw new Error("Order creation returned no id");
 
       clearCart();
-      router.push(`/pedido/${order.id}`);
+      router.push(`/pedido/${orderId}`);
     } catch (err) {
       console.error(err);
       toast.error("Hubo un error al procesar tu pedido. Intentá de nuevo.");

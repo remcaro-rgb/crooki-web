@@ -1,0 +1,4 @@
+-- Re-enable RLS for diagnostics.
+
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
