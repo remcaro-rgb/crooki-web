@@ -80,7 +80,10 @@
     "subtitle": "We'll contact you soon to coordinate delivery",
     "order_number": "Order number",
     "back_home": "Back to home",
-    "whatsapp_confirm": "Confirm via WhatsApp"
+    "whatsapp_confirm": "Confirm via WhatsApp",
+    "whatsapp_auto_sent_title": "📱 We opened WhatsApp with your order",
+    "whatsapp_auto_sent_body": "We've already sent your order to WhatsApp in a new tab. If it didn't open, tap the button below to retry.",
+    "whatsapp_resend": "Resend via WhatsApp"
   },
   "admin": {
     "dashboard": "Admin panel",

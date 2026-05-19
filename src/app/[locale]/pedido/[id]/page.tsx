@@ -3,45 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { CheckCircle2, Package, ArrowLeft, MessageCircle } from "lucide-react";
-
-const WHATSAPP_NUMBER = "573027190084"; // Número de Crooki sin + ni espacios
-
-function buildWhatsAppMessage(order: {
-  id: string;
-  customer_name: string;
-  customer_address: string;
-  notes: string;
-  total: number;
-  order_items: { product_name: string; quantity: number; unit_price: number }[];
-}) {
-  const orderId = order.id.slice(0, 8).toUpperCase();
-
-  const itemLines = order.order_items
-    .map(
-      (item) =>
-        `  • ${item.product_name} x${item.quantity} — $${(item.unit_price * item.quantity).toLocaleString("es-CO")}`
-    )
-    .join("\n");
-
-  const message = [
-    `🍪 *Nuevo pedido Crooki*`,
-    ``,
-    `*Pedido #${orderId}*`,
-    ``,
-    `*Productos:*`,
-    itemLines,
-    ``,
-    `*Total: $${order.total.toLocaleString("es-CO")}*`,
-    ``,
-    `*Cliente:* ${order.customer_name}`,
-    `*Dirección:* ${order.customer_address}`,
-    order.notes ? `*Notas:* ${order.notes}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
+import { buildWhatsAppOrderUrl } from "@/lib/whatsapp";
 
 export default async function OrderConfirmationPage({
   params,
@@ -64,7 +26,7 @@ export default async function OrderConfirmationPage({
 
   if (!order) notFound();
 
-  const whatsappUrl = buildWhatsAppMessage(order);
+  const whatsappUrl = buildWhatsAppOrderUrl(order);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-gray-50">
@@ -143,12 +105,9 @@ export default async function OrderConfirmationPage({
           style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0" }}
         >
           <p className="font-semibold text-green-800 mb-1">
-            📱 Confirma tu pedido por WhatsApp
+            {t("whatsapp_auto_sent_title")}
           </p>
-          <p className="text-green-700">
-            Toca el botón de abajo para enviarnos tu pedido por WhatsApp. Lo
-            procesaremos de inmediato y te confirmamos el tiempo de entrega.
-          </p>
+          <p className="text-green-700">{t("whatsapp_auto_sent_body")}</p>
         </div>
 
         {/* Botones */}
@@ -161,7 +120,7 @@ export default async function OrderConfirmationPage({
             style={{ backgroundColor: "#25D366" }}
           >
             <MessageCircle className="w-5 h-5" />
-            {t("whatsapp_confirm")}
+            {t("whatsapp_resend")}
           </a>
 
           <Link

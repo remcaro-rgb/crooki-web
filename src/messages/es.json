@@ -80,7 +80,10 @@
     "subtitle": "Te contactaremos pronto para coordinar la entrega",
     "order_number": "Número de pedido",
     "back_home": "Volver al inicio",
-    "whatsapp_confirm": "Confirmar por WhatsApp"
+    "whatsapp_confirm": "Confirmar por WhatsApp",
+    "whatsapp_auto_sent_title": "📱 Te abrimos WhatsApp con tu pedido",
+    "whatsapp_auto_sent_body": "Ya enviamos tu pedido a WhatsApp en otra pestaña. Si no se abrió, tocá el botón de abajo para reintentar.",
+    "whatsapp_resend": "Reenviar por WhatsApp"
   },
   "admin": {
     "dashboard": "Panel de administración",

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { ShoppingBag, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { buildWhatsAppOrderUrl } from "@/lib/whatsapp";
 
 interface FormData {
   name: string;
@@ -52,6 +53,10 @@ export default function CheckoutClient({ locale }: Props) {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
+
+    // Open a placeholder window synchronously inside the user-gesture so
+    // browsers don't block the WhatsApp pop-up after the awaited RPC.
+    const waWindow = typeof window !== "undefined" ? window.open("", "_blank") : null;
 
     try {
       const supabase = createClient();
@@ -99,10 +104,28 @@ export default function CheckoutClient({ locale }: Props) {
       if (rpcError) throw rpcError;
       if (!orderId) throw new Error("Order creation returned no id");
 
+      const whatsappUrl = buildWhatsAppOrderUrl({
+        id: orderId,
+        customer_name: form.name,
+        customer_address: form.address,
+        notes: form.notes,
+        total: totalAmount,
+        order_items: rpcItems,
+      });
+
+      if (waWindow && !waWindow.closed) {
+        waWindow.location.href = whatsappUrl;
+      } else {
+        // Popup was blocked or never opened — fall back to same-tab navigation
+        // so the message still reaches WhatsApp without an extra tap.
+        window.location.href = whatsappUrl;
+      }
+
       clearCart();
       router.push(`/pedido/${orderId}`);
     } catch (err) {
       console.error(err);
+      if (waWindow && !waWindow.closed) waWindow.close();
       toast.error("Hubo un error al procesar tu pedido. Intentá de nuevo.");
     } finally {
       setLoading(false);
