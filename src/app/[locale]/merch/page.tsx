@@ -12,9 +12,11 @@ async function loadMerch(): Promise<Product[]> {
     const supabase = await createClient();
     const { data: merchCats } = await supabase
       .from("categories")
-      .select("slug")
+      .select("slug, visible")
       .eq("kind", "merch");
-    const slugs = ((merchCats as { slug: string }[] | null) ?? []).map((c) => c.slug);
+    const slugs = ((merchCats as { slug: string; visible?: boolean }[] | null) ?? [])
+      .filter((c) => c.visible !== false)
+      .map((c) => c.slug);
     if (slugs.length === 0) return mockMerch;
     const { data: products } = await supabase
       .from("products")

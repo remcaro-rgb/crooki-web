@@ -23,6 +23,9 @@ export interface CategoryRow {
   label_en: string;
   kind: CategoryKind;
   display_order: number;
+  // Hidden categories (visible=false) are editable in the admin but excluded
+  // from the customer pages. Optional so mock/legacy rows default to shown.
+  visible?: boolean;
   created_at?: string;
 }
 
@@ -97,6 +100,18 @@ export interface BoxSelection {
   giftCardPrice: number; // 0 when giftCard === 'none'
 }
 
+// Customer's helado salsa add-ons captured in the cart. Salsa eligibility is
+// configured per-helado by the admin through the same `combo_salsas` rows the
+// combos use (combo_id = the helado's product id).
+export interface HeladoSelection {
+  salsas: Array<{
+    salsaId: string;
+    salsaName: string;
+    quantity: number;
+    extraPrice: number;
+  }>;
+}
+
 // Customer's combo configuration captured in the cart.
 export interface ComboSelection {
   cookieId: string;
@@ -121,6 +136,7 @@ export interface CartItem {
   lineId: string;
   combo?: ComboSelection;
   box?: BoxSelection;
+  helado?: HeladoSelection;
   // Per-unit price including all customization extras. Falls back to
   // `product.price` if absent.
   unitPrice?: number;

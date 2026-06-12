@@ -11,12 +11,19 @@ async function getProducts(): Promise<Product[]> {
   try {
     const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
-    const { data } = await supabase
+    // Featured products skip categories the admin hid from the customer pages.
+    const { data: cats } = await supabase
+      .from("categories")
+      .select("slug, visible");
+    const visibleSlugs = ((cats as { slug: string; visible?: boolean }[] | null) ?? [])
+      .filter((c) => c.visible !== false)
+      .map((c) => c.slug);
+    let query = supabase
       .from("products")
       .select("*, product_images(*)")
-      .eq("available", true)
-      .order("display_order")
-      .limit(6);
+      .eq("available", true);
+    if (visibleSlugs.length > 0) query = query.in("category", visibleSlugs);
+    const { data } = await query.order("display_order").limit(6);
     return data || mockProducts.slice(0, 6);
   } catch {
     return mockProducts.slice(0, 6);

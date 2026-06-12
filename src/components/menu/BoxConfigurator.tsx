@@ -94,18 +94,15 @@ export default function BoxConfigurator({ box, productsById, locale, onClose }: 
   const T = (es: string, en: string) => (locale === "en" ? en : es);
 
   // See ComboConfigurator: the product card has a hover transform that traps
-  // fixed-position descendants. Portal to body to escape it.
-  const [mounted, setMounted] = useState(false);
+  // fixed-position descendants. Portal to body to escape it (the modal only
+  // mounts after a click, so it never renders during SSR).
   useEffect(() => {
-    setMounted(true);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
   }, []);
-
-  if (!mounted) return null;
 
   const showGiftCard = (box.gift_card_price ?? null) !== null;
   const showGiftCardCake = (box.gift_card_cake_price ?? null) !== null;
@@ -298,7 +295,7 @@ export default function BoxConfigurator({ box, productsById, locale, onClose }: 
                       style={{ accentColor: "#8b0031" }}
                     />
                     <span className="flex-1 text-sm font-medium">
-                      {T("Con gift card + torta de cumpleaños", "With gift card + birthday cake")}
+                      {T("Con gift card + Vela", "With gift card + candle")}
                     </span>
                     <span className="text-xs font-bold" style={{ color: "#8b0031" }}>
                       +${(box.gift_card_cake_price ?? 0).toLocaleString("es-CO")}

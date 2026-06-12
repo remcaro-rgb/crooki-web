@@ -24,7 +24,11 @@ async function loadCatalog(): Promise<{ categories: CategoryRow[]; products: Pro
         .order("display_order"),
     ]);
     return {
-      categories: (categories as CategoryRow[]) ?? [],
+      // Admin-hidden categories are excluded from the public menu; their
+      // products drop out with them (the grid only renders listed categories).
+      categories: ((categories as CategoryRow[]) ?? []).filter(
+        (c) => c.visible !== false,
+      ),
       products: (products as Product[]) ?? mockProducts,
     };
   } catch {

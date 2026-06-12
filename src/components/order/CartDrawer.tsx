@@ -67,7 +67,7 @@ export default function CartDrawer() {
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((item) => {
-                const { product, quantity, lineId, combo, box, unitPrice } = item;
+                const { product, quantity, lineId, combo, box, helado, unitPrice } = item;
                 const name = locale === "en" ? product.name_en : product.name_es;
                 const imageUrl =
                   product.product_images?.[0]?.url ||
@@ -108,6 +108,16 @@ export default function CartDrawer() {
                         </ul>
                       )}
 
+                      {helado && (
+                        <ul className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+                          {helado.salsas.map((s) => (
+                            <li key={s.salsaId}>
+                              · +{s.quantity}× {s.salsaName}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
                       {box && (
                         <ul className="text-xs text-gray-500 mt-0.5 space-y-0.5">
                           {box.cookies.map((c) => (
@@ -123,8 +133,8 @@ export default function CartDrawer() {
                                   ? "Gift card"
                                   : "Gift card"
                                 : locale === "en"
-                                  ? "Gift card + birthday cake"
-                                  : "Gift card + torta"}
+                                  ? "Gift card + candle"
+                                  : "Gift card + vela"}
                             </li>
                           )}
                         </ul>

@@ -31,6 +31,7 @@ export default function CategoryFormClient({ locale, mode, category }: Props) {
     label_en: category?.label_en ?? "",
     kind: (category?.kind ?? "menu") as CategoryKind,
     display_order: category?.display_order?.toString() ?? "0",
+    visible: category?.visible ?? true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +49,7 @@ export default function CategoryFormClient({ locale, mode, category }: Props) {
       label_en: form.label_en || form.label_es,
       kind: form.kind,
       display_order: parseInt(form.display_order) || 0,
+      visible: form.visible,
     };
 
     const { error } =
@@ -189,6 +191,38 @@ export default function CategoryFormClient({ locale, mode, category }: Props) {
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold mb-1.5 text-gray-700">
+            Visible en la web
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer mt-1">
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={form.visible}
+                onChange={(e) => setForm({ ...form, visible: e.target.checked })}
+                className="sr-only"
+              />
+              <div
+                className="w-12 h-6 rounded-full transition-colors"
+                style={{ backgroundColor: form.visible ? "#8b0031" : "#d1d5db" }}
+              >
+                <div
+                  className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: form.visible ? "translateX(26px)" : "translateX(2px)" }}
+                />
+              </div>
+            </div>
+            <span className="text-sm font-medium text-gray-700">
+              {form.visible ? "Visible para clientes" : "Oculta para clientes"}
+            </span>
+          </label>
+          <p className="text-xs text-gray-400 mt-1">
+            Las categorías ocultas no aparecen en el menú ni en merch, pero siguen
+            siendo editables en el panel.
+          </p>
         </div>
 
         <div className="flex gap-4 pt-2">

@@ -79,9 +79,12 @@ export default function CheckoutClient({ locale }: Props) {
             item.box.giftCard === "card"
               ? " · Gift card"
               : item.box.giftCard === "card_and_cake"
-                ? " · Gift card + torta"
+                ? " · Gift card + vela"
                 : "";
           productName = `${baseName} · ${cookieParts.join(" + ")}${giftSuffix}`;
+        } else if (item.helado && item.helado.salsas.length > 0) {
+          const salsaParts = item.helado.salsas.map((s) => `${s.quantity}× ${s.salsaName}`);
+          productName = `${baseName} · ${salsaParts.join(" + ")}`;
         }
         return {
           product_id: item.product.id,
@@ -285,7 +288,7 @@ export default function CheckoutClient({ locale }: Props) {
 
               <div className="flex flex-col gap-3 mb-5">
                 {items.map((item) => {
-                  const { product, quantity, lineId, combo, box, unitPrice } = item;
+                  const { product, quantity, lineId, combo, box, helado, unitPrice } = item;
                   const name = locale === "en" ? product.name_en : product.name_es;
                   const linePrice = unitPrice ?? product.price;
                   return (
@@ -312,7 +315,14 @@ export default function CheckoutClient({ locale }: Props) {
                           <div className="text-xs text-gray-400 mt-0.5">
                             {box.cookies.map((c) => `${c.quantity}× ${c.cookieName}`).join(", ")}
                             {box.giftCard === "card" && " · Gift card"}
-                            {box.giftCard === "card_and_cake" && " · Gift card + torta"}
+                            {box.giftCard === "card_and_cake" && " · Gift card + vela"}
+                          </div>
+                        )}
+                        {helado && helado.salsas.length > 0 && (
+                          <div className="text-xs text-gray-400 mt-0.5">
+                            {helado.salsas
+                              .map((s) => `${s.quantity}× ${s.salsaName}`)
+                              .join(", ")}
                           </div>
                         )}
                       </div>

@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { BoxSelection, CartItem, ComboSelection, Product } from "@/lib/types";
+import type {
+  BoxSelection,
+  CartItem,
+  ComboSelection,
+  HeladoSelection,
+  Product,
+} from "@/lib/types";
 
 interface CartStore {
   items: CartItem[];
@@ -8,6 +14,7 @@ interface CartStore {
   addItem: (product: Product) => void;
   addCombo: (product: Product, selection: ComboSelection, unitPrice: number) => void;
   addBox: (product: Product, selection: BoxSelection, unitPrice: number) => void;
+  addHelado: (product: Product, selection: HeladoSelection, unitPrice: number) => void;
   removeItem: (lineId: string) => void;
   updateQuantity: (lineId: string, quantity: number) => void;
   clearCart: () => void;
@@ -23,6 +30,13 @@ function comboSelectionKey(s: ComboSelection): string {
     .map((x) => `${x.salsaId}:${x.quantity}`)
     .join(",");
   return `${s.cookieId}|${s.includedSalsaId ?? ""}|${extras}`;
+}
+
+function heladoSelectionKey(s: HeladoSelection): string {
+  return [...s.salsas]
+    .sort((a, b) => a.salsaId.localeCompare(b.salsaId))
+    .map((x) => `${x.salsaId}:${x.quantity}`)
+    .join(",");
 }
 
 function boxSelectionKey(s: BoxSelection): string {
@@ -100,6 +114,27 @@ export const useCartStore = create<CartStore>()(
             items: [
               ...items,
               { product, quantity: 1, lineId, box: selection, unitPrice },
+            ],
+          });
+        }
+        set({ isOpen: true });
+      },
+
+      addHelado: (product: Product, selection: HeladoSelection, unitPrice: number) => {
+        const { items } = get();
+        const lineId = `${product.id}#helado#${heladoSelectionKey(selection)}`;
+        const existing = items.find((i) => i.lineId === lineId);
+        if (existing) {
+          set({
+            items: items.map((i) =>
+              i.lineId === lineId ? { ...i, quantity: i.quantity + 1 } : i,
+            ),
+          });
+        } else {
+          set({
+            items: [
+              ...items,
+              { product, quantity: 1, lineId, helado: selection, unitPrice },
             ],
           });
         }

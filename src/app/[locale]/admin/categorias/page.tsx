@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
+import CategoryVisibilityToggle from "@/components/admin/CategoryVisibilityToggle";
 import type { CategoryRow } from "@/lib/types";
 
 export default async function AdminCategoriesPage({
@@ -51,6 +52,10 @@ export default async function AdminCategoriesPage({
                       {counts.get(c.slug) ?? 0} producto{(counts.get(c.slug) ?? 0) === 1 ? "" : "s"}
                     </p>
                   </div>
+                  <CategoryVisibilityToggle
+                    slug={c.slug}
+                    initialVisible={c.visible !== false}
+                  />
                   <Link
                     href={`/${locale}/admin/categorias/${c.slug}/editar`}
                     className="text-sm font-semibold px-4 py-1.5 border rounded-full hover:bg-gray-100 transition-colors"

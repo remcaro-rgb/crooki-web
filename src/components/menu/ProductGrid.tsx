@@ -1,13 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { CategoryRow, Product } from "@/lib/types";
+import type { BoxSelection, CategoryRow, Product } from "@/lib/types";
 import { CATEGORY_ORDER } from "@/lib/types";
 import { useCartStore } from "@/store/cart";
 import { Plus, Check, Settings2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ComboConfigurator from "./ComboConfigurator";
 import BoxConfigurator from "./BoxConfigurator";
+import HeladoConfigurator from "./HeladoConfigurator";
 
 interface Props {
   products: Product[];
@@ -25,13 +26,29 @@ function ProductCard({
   productsById: Map<string, Product>;
 }) {
   const t = useTranslations("menu");
-  const { addItem } = useCartStore();
+  const { addItem, addBox } = useCartStore();
   const [added, setAdded] = useState(false);
   const [configuring, setConfiguring] = useState(false);
 
   const isCombo = product.category === "combos";
   const isBox = product.category === "cajas";
-  const isConfigurable = isCombo || isBox;
+  // Helados only become configurable once the admin whitelists salsas for them.
+  const isHelado =
+    product.category === "helados" && (product.combo_salsas?.length ?? 0) > 0;
+
+  // A caja with exactly one eligible cookie and no gift-card add-ons has
+  // nothing to customize: the customer just gets `box_cookie_count` units of
+  // that cookie, so the card shows "+ Agregar" instead of "Personalizar".
+  const boxRows = isBox ? product.box_cookies ?? [] : [];
+  const singleBoxCookie =
+    isBox &&
+    boxRows.length === 1 &&
+    product.gift_card_price == null &&
+    product.gift_card_cake_price == null
+      ? productsById.get(boxRows[0].cookie_id)
+      : undefined;
+
+  const isConfigurable = isCombo || isHelado || (isBox && !singleBoxCookie);
 
   const name = locale === "en" ? product.name_en : product.name_es;
   const description = locale === "en" ? product.description_en : product.description_es;
@@ -40,6 +57,26 @@ function ProductCard({
     `/images/${product.id.toLowerCase().replace(/\s+/g, "-")}.jpg`;
 
   const handleAdd = () => {
+    if (singleBoxCookie) {
+      const count = Math.max(2, product.box_cookie_count ?? 2);
+      const selection: BoxSelection = {
+        cookies: [
+          {
+            cookieId: boxRows[0].cookie_id,
+            cookieName:
+              locale === "en" ? singleBoxCookie.name_en : singleBoxCookie.name_es,
+            quantity: count,
+            extraPrice: boxRows[0].extra_price,
+          },
+        ],
+        giftCard: "none",
+        giftCardPrice: 0,
+      };
+      addBox(product, selection, product.price + count * boxRows[0].extra_price);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+      return;
+    }
     if (isConfigurable) {
       setConfiguring(true);
       return;
@@ -135,6 +172,14 @@ function ProductCard({
           onClose={() => setConfiguring(false)}
         />
       )}
+      {configuring && isHelado && (
+        <HeladoConfigurator
+          helado={product}
+          productsById={productsById}
+          locale={locale}
+          onClose={() => setConfiguring(false)}
+        />
+      )}
     </div>
   );
 }
@@ -212,10 +257,14 @@ export default function ProductGrid({ products, categories, locale }: Props) {
   const tFallback = useTranslations("categories");
   const navRef = useRef<HTMLDivElement>(null);
 
-  // If DB categories are provided, use them. Otherwise fall back to the legacy
-  // hardcoded list (keeps the mock-data/dev path working).
+  // If DB categories are provided, use them (skipping admin-hidden ones).
+  // Otherwise fall back to the legacy hardcoded list (keeps the mock-data/dev
+  // path working).
   const displayCategories = useMemo(() => {
-    if (categories.length > 0) return [...categories].sort((a, b) => a.display_order - b.display_order);
+    if (categories.length > 0)
+      return categories
+        .filter((c) => c.visible !== false)
+        .sort((a, b) => a.display_order - b.display_order);
     return CATEGORY_ORDER.map((slug, i) => ({
       slug,
       label_es: tFallback(slug),

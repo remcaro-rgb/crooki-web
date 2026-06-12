@@ -33,6 +33,59 @@ interface ComboPickerEntry {
   extra: string;
 }
 
+// Checkbox + extra-price list shared by the combo and helado salsa sections.
+function SalsaPickerList({
+  allSalsas,
+  picker,
+  onToggle,
+  onSetExtra,
+}: {
+  allSalsas: ReferenceProduct[];
+  picker: Record<string, ComboPickerEntry>;
+  onToggle: (id: string, defaultExtra: string) => void;
+  onSetExtra: (id: string, value: string) => void;
+}) {
+  if (allSalsas.length === 0) {
+    return <div className="text-sm text-gray-400">No hay salsas en el catálogo.</div>;
+  }
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+      {allSalsas.map((s) => {
+        const entry = picker[s.id] ?? { selected: false, extra: String(s.price) };
+        return (
+          <div key={s.id} className="flex items-center gap-3 px-4 py-2.5">
+            <input
+              type="checkbox"
+              checked={entry.selected}
+              onChange={() => onToggle(s.id, String(s.price))}
+              className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+              style={{ accentColor: "#8b0031" }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{s.name_es}</p>
+              <p className="text-xs text-gray-400">
+                Precio base: ${s.price.toLocaleString("es-CO")}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">+ $</span>
+              <input
+                type="number"
+                value={entry.extra}
+                onChange={(e) => onSetExtra(s.id, e.target.value)}
+                disabled={!entry.selected}
+                min="0"
+                step="100"
+                className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-right disabled:bg-gray-50 disabled:text-gray-300"
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ProductFormClient({
   locale,
   mode,
@@ -82,6 +135,9 @@ export default function ProductFormClient({
 
   const isCombo = form.category === "combos";
   const isBox = form.category === "cajas";
+  // Helados reuse the combo salsa whitelist (combo_salsas keyed by the
+  // helado's product id) to define which salsas the customer may add.
+  const isHelado = form.category === "helados";
 
   const [includesSalsa, setIncludesSalsa] = useState<boolean>(
     product?.includes_salsa ?? false,
@@ -280,24 +336,12 @@ export default function ProductFormClient({
         setUploadingImages(false);
       }
 
-      // Persist combo configuration: replace-all strategy is simpler and safe
-      // since the rows are pure metadata with no foreign-key children.
-      if (isCombo && productId) {
-        await supabase.from("combo_cookies").delete().eq("combo_id", productId);
+      // Persist combo/helado configuration: replace-all strategy is simpler
+      // and safe since the rows are pure metadata with no foreign-key
+      // children. Combos persist both pickers; helados persist only the salsa
+      // whitelist (stored in the same combo_salsas table).
+      if ((isCombo || isHelado) && productId) {
         await supabase.from("combo_salsas").delete().eq("combo_id", productId);
-
-        const cookieRows = Object.entries(cookiePicker)
-          .filter(([, v]) => v.selected)
-          .map(([cookieId, v], idx) => ({
-            combo_id: productId,
-            cookie_id: cookieId,
-            extra_price: parseFloat(v.extra) || 0,
-            display_order: idx,
-          }));
-        if (cookieRows.length > 0) {
-          const { error: ccErr } = await supabase.from("combo_cookies").insert(cookieRows);
-          if (ccErr) throw ccErr;
-        }
 
         const salsaRows = Object.entries(salsaPicker)
           .filter(([, v]) => v.selected)
@@ -310,6 +354,23 @@ export default function ProductFormClient({
         if (salsaRows.length > 0) {
           const { error: csErr } = await supabase.from("combo_salsas").insert(salsaRows);
           if (csErr) throw csErr;
+        }
+      }
+
+      if (isCombo && productId) {
+        await supabase.from("combo_cookies").delete().eq("combo_id", productId);
+
+        const cookieRows = Object.entries(cookiePicker)
+          .filter(([, v]) => v.selected)
+          .map(([cookieId, v], idx) => ({
+            combo_id: productId,
+            cookie_id: cookieId,
+            extra_price: parseFloat(v.extra) || 0,
+            display_order: idx,
+          }));
+        if (cookieRows.length > 0) {
+          const { error: ccErr } = await supabase.from("combo_cookies").insert(cookieRows);
+          if (ccErr) throw ccErr;
         }
       }
 
@@ -697,48 +758,43 @@ export default function ProductFormClient({
                 Salsas disponibles
               </label>
               <p className="text-xs text-gray-500 mb-3">
-                Selecciona qué salsas el cliente puede agregar (y, si &ldquo;Incluye una salsa&rdquo;
-                está activo, también de las que puede elegir como salsa incluida).
-                Por defecto el precio extra es el precio mismo de la salsa.
+                Si &ldquo;Incluye una salsa&rdquo; está activo, el cliente elige su
+                salsa incluida (sin costo) entre las marcadas.
               </p>
-              {allSalsas.length === 0 ? (
-                <div className="text-sm text-gray-400">No hay salsas en el catálogo.</div>
-              ) : (
-                <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
-                  {allSalsas.map((s) => {
-                    const entry = salsaPicker[s.id] ?? { selected: false, extra: String(s.price) };
-                    return (
-                      <div key={s.id} className="flex items-center gap-3 px-4 py-2.5">
-                        <input
-                          type="checkbox"
-                          checked={entry.selected}
-                          onChange={() => toggleSalsa(s.id, String(s.price))}
-                          className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                          style={{ accentColor: "#8b0031" }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{s.name_es}</p>
-                          <p className="text-xs text-gray-400">
-                            Precio base: ${s.price.toLocaleString("es-CO")}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">+ $</span>
-                          <input
-                            type="number"
-                            value={entry.extra}
-                            onChange={(e) => setSalsaExtra(s.id, e.target.value)}
-                            disabled={!entry.selected}
-                            min="0"
-                            step="100"
-                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-right disabled:bg-gray-50 disabled:text-gray-300"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <SalsaPickerList
+                allSalsas={allSalsas}
+                picker={salsaPicker}
+                onToggle={toggleSalsa}
+                onSetExtra={setSalsaExtra}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Helado configuration — only when category=helados */}
+        {isHelado && (
+          <div className="rounded-2xl border border-gray-200 p-6 flex flex-col gap-6 bg-gray-50/50">
+            <div>
+              <h2 className="text-lg font-black mb-1" style={{ color: "#8b0031" }}>
+                Configuración del Helado
+              </h2>
+              <p className="text-sm text-gray-500">
+                Selecciona qué salsas el cliente puede agregar al helado. Los precios
+                extra se suman al precio base. Por defecto el precio extra es el
+                precio mismo de la salsa.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                Salsas disponibles
+              </label>
+              <SalsaPickerList
+                allSalsas={allSalsas}
+                picker={salsaPicker}
+                onToggle={toggleSalsa}
+                onSetExtra={setSalsaExtra}
+              />
             </div>
           </div>
         )}
@@ -752,7 +808,7 @@ export default function ProductFormClient({
               </h2>
               <p className="text-sm text-gray-500">
                 Define cuántas galletas trae la caja, qué galletas el cliente puede elegir
-                y los add-ons opcionales (gift card, gift card + torta).
+                y los add-ons opcionales (gift card, gift card + vela).
               </p>
             </div>
 
@@ -789,7 +845,7 @@ export default function ProductFormClient({
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-1.5 text-gray-700">
-                  Precio Gift Card + Torta (opcional)
+                  Precio Gift Card + Vela (opcional)
                 </label>
                 <input
                   type="number"

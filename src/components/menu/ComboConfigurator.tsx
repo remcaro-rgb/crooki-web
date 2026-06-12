@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, Minus, Plus, Loader2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import type { ComboSelection, Product } from "@/lib/types";
 
@@ -46,7 +46,6 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
   const [includedSalsaId, setIncludedSalsaId] = useState<string>(
     combo.includes_salsa ? salsaRows[0]?.row.salsa_id ?? "" : "",
   );
-  const [extraSalsaQty, setExtraSalsaQty] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
 
   const cookieExtra = useMemo(() => {
@@ -54,22 +53,7 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
     return r?.row.extra_price ?? 0;
   }, [cookieRows, cookieId]);
 
-  const additionalSalsasTotal = useMemo(() => {
-    let sum = 0;
-    for (const { row } of salsaRows) {
-      const qty = extraSalsaQty[row.salsa_id] ?? 0;
-      sum += qty * row.extra_price;
-    }
-    return sum;
-  }, [salsaRows, extraSalsaQty]);
-
-  const unitPrice = combo.price + cookieExtra + additionalSalsasTotal;
-
-  const setQty = (salsaId: string, delta: number) =>
-    setExtraSalsaQty((cur) => {
-      const next = Math.max(0, (cur[salsaId] ?? 0) + delta);
-      return { ...cur, [salsaId]: next };
-    });
+  const unitPrice = combo.price + cookieExtra;
 
   const canAdd = !!cookieId && (!combo.includes_salsa || !!includedSalsaId);
 
@@ -92,14 +76,9 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
           ? includedSalsaProduct.name_en
           : includedSalsaProduct.name_es
         : undefined,
-      additionalSalsas: salsaRows
-        .filter(({ row }) => (extraSalsaQty[row.salsa_id] ?? 0) > 0)
-        .map(({ row, product }) => ({
-          salsaId: row.salsa_id,
-          salsaName: locale === "en" ? product!.name_en : product!.name_es,
-          quantity: extraSalsaQty[row.salsa_id]!,
-          extraPrice: row.extra_price,
-        })),
+      // Extra paid salsas were removed from the combo flow; the field stays
+      // for cart/checkout type compatibility.
+      additionalSalsas: [],
     };
 
     addCombo(combo, selection, unitPrice);
@@ -113,18 +92,15 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
   // containing block for `position: fixed` descendants. Without a portal the
   // modal would render relative to the card — appearing as a tiny box and
   // jumping to viewport coordinates when hover ends. Portal to <body> escapes
-  // the transform context. Lock body scroll while the modal is open.
-  const [mounted, setMounted] = useState(false);
+  // the transform context (safe here: the modal only mounts after a click, so
+  // it never renders during SSR). Lock body scroll while the modal is open.
   useEffect(() => {
-    setMounted(true);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previous;
     };
   }, []);
-
-  if (!mounted) return null;
 
   const overlay = (
     <div
@@ -255,60 +231,6 @@ export default function ComboConfigurator({ combo, productsById, locale, onClose
             </section>
           )}
 
-          {/* Additional salsas */}
-          <section>
-            <h3 className="font-bold text-base mb-3">
-              {combo.includes_salsa ? "3. " : "2. "}
-              {T("Salsas adicionales", "Extra sauces")}{" "}
-              <span className="text-xs font-normal text-gray-400 ml-2">
-                {T("(opcional, con costo extra)", "(optional, extra cost)")}
-              </span>
-            </h3>
-            {salsaRows.length === 0 ? (
-              <div className="text-sm text-gray-400 rounded-xl border border-dashed border-gray-200 p-4 text-center">
-                {T("Sin salsas disponibles.", "No sauces available.")}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {salsaRows.map(({ row, product }) => {
-                  const qty = extraSalsaQty[row.salsa_id] ?? 0;
-                  const name = locale === "en" ? product!.name_en : product!.name_es;
-                  return (
-                    <div
-                      key={row.salsa_id}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{name}</p>
-                        <p className="text-xs" style={{ color: "#8b0031" }}>
-                          +${row.extra_price.toLocaleString("es-CO")}{" "}
-                          {T("por salsa", "per sauce")}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setQty(row.salsa_id, -1)}
-                          disabled={qty === 0}
-                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="text-sm font-semibold w-6 text-center">{qty}</span>
-                        <button
-                          type="button"
-                          onClick={() => setQty(row.salsa_id, +1)}
-                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
         </div>
 
         {/* Footer */}
