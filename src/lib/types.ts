@@ -61,6 +61,7 @@ export interface Product {
   gift_card_price?: number | null;
   gift_card_cake_price?: number | null;
   box_cookies?: BoxCookieRow[];
+  included_salsas_count?: number;
 }
 
 export interface ComboCookieRow {

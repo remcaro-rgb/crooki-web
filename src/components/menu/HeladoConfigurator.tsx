@@ -8,9 +8,6 @@ import type { HeladoSelection, Product } from "@/lib/types";
 
 interface Props {
   helado: Product;
-  // Lookup of all products keyed by id, used to resolve salsa names for the
-  // rows referenced by `helado.combo_salsas` (the per-product salsa whitelist
-  // shared with combos).
   productsById: Map<string, Product>;
   locale: string;
   onClose: () => void;
@@ -19,6 +16,10 @@ interface Props {
 export default function HeladoConfigurator({ helado, productsById, locale, onClose }: Props) {
   const addHelado = useCartStore((s) => s.addHelado);
   const addItem = useCartStore((s) => s.addItem);
+
+  // >0 means salsas are included in the price up to that count; 0 means extra/paid
+  const maxSalsas = helado.included_salsas_count ?? 0;
+  const isIncludedMode = maxSalsas > 0;
 
   const salsaRows = useMemo(
     () =>
@@ -35,11 +36,15 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
   const [salsaQty, setSalsaQty] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
 
+  const totalSalsas = useMemo(
+    () => Object.values(salsaQty).reduce((s, v) => s + v, 0),
+    [salsaQty],
+  );
+
   const salsasTotal = useMemo(() => {
     let sum = 0;
     for (const { row } of salsaRows) {
-      const qty = salsaQty[row.salsa_id] ?? 0;
-      sum += qty * row.extra_price;
+      sum += (salsaQty[row.salsa_id] ?? 0) * row.extra_price;
     }
     return sum;
   }, [salsaRows, salsaQty]);
@@ -48,7 +53,12 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
 
   const setQty = (salsaId: string, delta: number) =>
     setSalsaQty((cur) => {
-      const next = Math.max(0, (cur[salsaId] ?? 0) + delta);
+      const currentQty = cur[salsaId] ?? 0;
+      if (delta > 0 && isIncludedMode) {
+        const totalNow = Object.values(cur).reduce((s, v) => s + v, 0);
+        if (totalNow >= maxSalsas) return cur;
+      }
+      const next = Math.max(0, currentQty + delta);
       return { ...cur, [salsaId]: next };
     });
 
@@ -67,8 +77,6 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
     };
 
     if (selection.salsas.length === 0) {
-      // No add-ons picked — fall back to a plain line so it merges with
-      // products added directly from the card.
       addItem(helado);
     } else {
       addHelado(helado, selection, unitPrice);
@@ -79,9 +87,6 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
 
   const T = (es: string, en: string) => (locale === "en" ? en : es);
 
-  // See ComboConfigurator: the product card has a hover transform that traps
-  // fixed-position descendants. Portal to body to escape it (the modal only
-  // mounts after a click, so it never renders during SSR).
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -122,14 +127,35 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-          {/* Salsa add-ons */}
           <section>
-            <h3 className="font-bold text-base mb-3">
-              {T("Salsas adicionales", "Extra sauces")}{" "}
-              <span className="text-xs font-normal text-gray-400 ml-2">
-                {T("(opcional, con costo extra)", "(optional, extra cost)")}
-              </span>
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-base">
+                {isIncludedMode
+                  ? T(
+                      `Salsa${maxSalsas > 1 ? "s" : ""} incluida${maxSalsas > 1 ? "s" : ""}`,
+                      `Included sauce${maxSalsas > 1 ? "s" : ""}`,
+                    )
+                  : T("Salsas adicionales", "Extra sauces")}
+                {" "}
+                <span className="text-xs font-normal text-gray-400 ml-1">
+                  {isIncludedMode
+                    ? T(`(elige hasta ${maxSalsas})`, `(pick up to ${maxSalsas})`)
+                    : T("(opcional, con costo extra)", "(optional, extra cost)")}
+                </span>
+              </h3>
+              {isIncludedMode && (
+                <span
+                  className="text-sm font-bold px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: totalSalsas === maxSalsas ? "#16a34a" : "#f3f4f6",
+                    color: totalSalsas === maxSalsas ? "#ffffff" : "#374151",
+                  }}
+                >
+                  {totalSalsas} / {maxSalsas}
+                </span>
+              )}
+            </div>
+
             {salsaRows.length === 0 ? (
               <div className="text-sm text-gray-400 rounded-xl border border-dashed border-gray-200 p-4 text-center">
                 {T("Sin salsas disponibles.", "No sauces available.")}
@@ -139,6 +165,7 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
                 {salsaRows.map(({ row, product }) => {
                   const qty = salsaQty[row.salsa_id] ?? 0;
                   const name = locale === "en" ? product!.name_en : product!.name_es;
+                  const plusDisabled = isIncludedMode && totalSalsas >= maxSalsas;
                   return (
                     <div
                       key={row.salsa_id}
@@ -146,10 +173,12 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{name}</p>
-                        <p className="text-xs" style={{ color: "#8b0031" }}>
-                          +${row.extra_price.toLocaleString("es-CO")}{" "}
-                          {T("por salsa", "per sauce")}
-                        </p>
+                        {row.extra_price > 0 && (
+                          <p className="text-xs" style={{ color: "#8b0031" }}>
+                            +${row.extra_price.toLocaleString("es-CO")}{" "}
+                            {T("por salsa", "per sauce")}
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
@@ -164,7 +193,8 @@ export default function HeladoConfigurator({ helado, productsById, locale, onClo
                         <button
                           type="button"
                           onClick={() => setQty(row.salsa_id, +1)}
-                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100"
+                          disabled={plusDisabled}
+                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
