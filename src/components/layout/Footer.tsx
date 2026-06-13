@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { MapPin } from "lucide-react";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -20,6 +21,7 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
+const MAPS_URL = "https://maps.app.goo.gl/SKck7m5eoNfa3SBb6";
 const INSTAGRAM_URL =
   "https://www.instagram.com/crookibakebar?igsh=MWJjcnJoazB5ZmxkaQ==";
 const TIKTOK_URL =
@@ -118,6 +120,16 @@ export default function Footer() {
               >
                 <WhatsAppIcon className="w-5 h-5" />
                 +57 302 719 0084
+              </a>
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={tc("maps")}
+                className="flex items-center gap-3 text-sm text-white hover:text-red-200 transition-colors"
+              >
+                <MapPin className="w-5 h-5" />
+                {tc("maps")}
               </a>
             </div>
           </div>

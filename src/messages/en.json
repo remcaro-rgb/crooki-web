@@ -119,7 +119,8 @@
   "contact": {
     "whatsapp": "Chat with us on WhatsApp",
     "instagram": "Follow us on Instagram",
-    "tiktok": "Follow us on TikTok"
+    "tiktok": "Follow us on TikTok",
+    "maps": "Get directions"
   },
   "common": {
     "loading": "Loading...",
