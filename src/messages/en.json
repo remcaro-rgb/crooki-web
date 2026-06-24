@@ -65,6 +65,8 @@
     "email_placeholder": "you@email.com",
     "phone": "Phone / WhatsApp",
     "phone_placeholder": "+57 300 123 4567",
+    "recipient_phone": "Delivery contact phone",
+    "recipient_phone_placeholder": "+57 300 123 4567",
     "address": "Delivery address",
     "address_placeholder": "Street, number, apartment.",
     "notes": "Additional notes",

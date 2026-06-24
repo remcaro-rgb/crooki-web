@@ -65,6 +65,8 @@
     "email_placeholder": "tu@email.com",
     "phone": "Teléfono / WhatsApp",
     "phone_placeholder": "+57 300 123 4567",
+    "recipient_phone": "Teléfono de quien recibe",
+    "recipient_phone_placeholder": "+57 300 123 4567",
     "address": "Dirección de entrega",
     "address_placeholder": "Calle, número, apto.",
     "notes": "Comentarios adicionales",

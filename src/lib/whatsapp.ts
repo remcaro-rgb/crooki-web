@@ -10,6 +10,7 @@ export interface WhatsAppOrder {
   id: string;
   customer_name: string;
   customer_address: string;
+  recipient_phone: string;
   notes: string | null;
   total: number;
   order_items: WhatsAppOrderItem[];
@@ -37,6 +38,7 @@ export function buildWhatsAppOrderUrl(order: WhatsAppOrder): string {
     ``,
     `*Cliente:* ${order.customer_name}`,
     `*Dirección:* ${order.customer_address}`,
+    `*Tel. destinatario:* ${order.recipient_phone}`,
     order.notes ? `*Notas:* ${order.notes}` : null,
   ]
     .filter(Boolean)

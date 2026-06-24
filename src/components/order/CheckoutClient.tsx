@@ -14,6 +14,7 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
+  recipient_phone: string;
   address: string;
   notes: string;
 }
@@ -32,6 +33,7 @@ export default function CheckoutClient({ locale }: Props) {
     name: "",
     email: "",
     phone: "",
+    recipient_phone: "",
     address: "",
     notes: "",
   });
@@ -44,6 +46,7 @@ export default function CheckoutClient({ locale }: Props) {
     if (!form.name.trim()) newErrors.name = t("required");
     if (!form.email.trim()) newErrors.email = t("required");
     if (!form.phone.trim()) newErrors.phone = t("required");
+    if (!form.recipient_phone.trim()) newErrors.recipient_phone = t("required");
     if (!form.address.trim()) newErrors.address = t("required");
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -111,6 +114,7 @@ export default function CheckoutClient({ locale }: Props) {
         id: orderId,
         customer_name: form.name,
         customer_address: form.address,
+        recipient_phone: form.recipient_phone,
         notes: form.notes,
         total: totalAmount,
         order_items: rpcItems,
@@ -226,6 +230,23 @@ export default function CheckoutClient({ locale }: Props) {
               />
               {errors.phone && (
                 <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Recipient phone */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5 text-gray-700">
+                {t("recipient_phone")} *
+              </label>
+              <input
+                type="tel"
+                placeholder={t("recipient_phone_placeholder")}
+                value={form.recipient_phone}
+                onChange={(e) => setForm({ ...form, recipient_phone: e.target.value })}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all"
+              />
+              {errors.recipient_phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.recipient_phone}</p>
               )}
             </div>
 
