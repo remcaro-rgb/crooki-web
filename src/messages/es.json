@@ -144,6 +144,8 @@
     "footer_title": "Legal",
     "data_policy": "Tratamiento de datos",
     "cookie_policy": "Cookies",
-    "club_terms": "Términos Club Crooki"
+    "club_terms": "Términos Club Crooki",
+    "club_image_alt": "Tarjeta Crooki Rewards con código QR para agregarla a Apple Wallet o Google Wallet",
+    "club_cta": "Obtener mi tarjeta del Club"
   }
 }
