@@ -75,7 +75,10 @@
     "total": "Total",
     "submit": "Hacer pedido",
     "submitting": "Enviando...",
-    "required": "Campo requerido"
+    "required": "Campo requerido",
+    "privacy_accept": "Autorizo el tratamiento de mis datos personales para gestionar mi pedido, conforme a la",
+    "privacy_link": "Política de Tratamiento de Datos",
+    "privacy_required": "Debes aceptar la política de datos para hacer el pedido"
   },
   "confirmation": {
     "title": "¡Pedido recibido!",
@@ -132,5 +135,15 @@
     "back": "Volver",
     "cookies": "galletas",
     "currency": "$"
+  },
+  "legal": {
+    "title": "Legal",
+    "subtitle": "Políticas y términos de Crooki Bake Bar",
+    "back": "Volver a legal",
+    "translation_note": "",
+    "footer_title": "Legal",
+    "data_policy": "Tratamiento de datos",
+    "cookie_policy": "Cookies",
+    "club_terms": "Términos Club Crooki"
   }
 }

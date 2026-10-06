@@ -75,7 +75,10 @@
     "total": "Total",
     "submit": "Place order",
     "submitting": "Sending...",
-    "required": "Required field"
+    "required": "Required field",
+    "privacy_accept": "I authorize the processing of my personal data to handle my order, under the",
+    "privacy_link": "Personal Data Processing Policy",
+    "privacy_required": "You must accept the data policy to place your order"
   },
   "confirmation": {
     "title": "Order received!",
@@ -132,5 +135,15 @@
     "back": "Back",
     "cookies": "cookies",
     "currency": "$"
+  },
+  "legal": {
+    "title": "Legal",
+    "subtitle": "Crooki Bake Bar policies and terms",
+    "back": "Back to legal",
+    "translation_note": "This is a courtesy translation. The Spanish version is the official, legally binding text.",
+    "footer_title": "Legal",
+    "data_policy": "Data processing",
+    "cookie_policy": "Cookies",
+    "club_terms": "Club Crooki terms"
   }
 }

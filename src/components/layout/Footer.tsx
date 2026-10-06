@@ -57,6 +57,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 export default function Footer() {
   const t = useTranslations("nav");
   const tc = useTranslations("contact");
+  const tl = useTranslations("legal");
 
   return (
     <footer style={{ backgroundColor: "#8b0031" }} className="text-white">
@@ -136,6 +137,17 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-red-700 mt-8 pt-6 text-center text-red-300 text-xs">
+          <nav aria-label={tl("footer_title")} className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
+            <Link href="/legal/politica-de-datos" className="text-white hover:text-red-200 transition-colors">
+              {tl("data_policy")}
+            </Link>
+            <Link href="/legal/politica-de-cookies" className="text-white hover:text-red-200 transition-colors">
+              {tl("cookie_policy")}
+            </Link>
+            <Link href="/legal/terminos-club-crooki" className="text-white hover:text-red-200 transition-colors">
+              {tl("club_terms")}
+            </Link>
+          </nav>
           © {new Date().getFullYear()} Crooki. Todos los derechos reservados.
         </div>
       </div>

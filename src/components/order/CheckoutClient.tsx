@@ -38,6 +38,8 @@ export default function CheckoutClient({ locale }: Props) {
     notes: "",
   });
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [policyError, setPolicyError] = useState(false);
 
   const totalAmount = total();
 
@@ -49,7 +51,8 @@ export default function CheckoutClient({ locale }: Props) {
     if (!form.recipient_phone.trim()) newErrors.recipient_phone = t("required");
     if (!form.address.trim()) newErrors.address = t("required");
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setPolicyError(!acceptedPolicy);
+    return Object.keys(newErrors).length === 0 && acceptedPolicy;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -279,6 +282,36 @@ export default function CheckoutClient({ locale }: Props) {
                 rows={3}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none"
               />
+            </div>
+
+            {/* Data policy consent (Ley 1581 de 2012) */}
+            <div>
+              <label className="flex items-start gap-3 text-sm text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedPolicy}
+                  onChange={(e) => {
+                    setAcceptedPolicy(e.target.checked);
+                    if (e.target.checked) setPolicyError(false);
+                  }}
+                  className="mt-0.5 w-4 h-4 shrink-0 accent-[#8b0031]"
+                />
+                <span>
+                  {t("privacy_accept")}{" "}
+                  <Link
+                    href="/legal/politica-de-datos"
+                    target="_blank"
+                    className="underline font-semibold"
+                    style={{ color: "#8b0031" }}
+                  >
+                    {t("privacy_link")}
+                  </Link>
+                  {" *"}
+                </span>
+              </label>
+              {policyError && (
+                <p className="text-red-500 text-xs mt-1">{t("privacy_required")}</p>
+              )}
             </div>
 
             {/* Submit */}
