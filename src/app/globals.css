@@ -163,3 +163,25 @@
     display: none;
   }
 }
+
+/* Footer "bite": overlapping circles cut out of the top-right edge, like a
+   bitten cookie. The footer is pulled up over the previous section (-mt-10 on
+   the footer) so the bite reveals that section's own background. Bite depth
+   stays under 40px; sizes shrink on small screens. */
+.footer-bite {
+  --bite: radial-gradient(circle 56px at calc(100% - 200px) -16px, transparent 98%, #000),
+    radial-gradient(circle 44px at calc(100% - 115px) -6px, transparent 98%, #000),
+    radial-gradient(circle 50px at calc(100% - 30px) -14px, transparent 98%, #000);
+  -webkit-mask-image: var(--bite);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--bite);
+  mask-composite: intersect;
+}
+
+@media (max-width: 767px) {
+  .footer-bite {
+    --bite: radial-gradient(circle 36px at calc(100% - 115px) -8px, transparent 98%, #000),
+      radial-gradient(circle 28px at calc(100% - 64px) -4px, transparent 98%, #000),
+      radial-gradient(circle 32px at calc(100% - 16px) -8px, transparent 98%, #000);
+  }
+}

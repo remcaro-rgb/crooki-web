@@ -147,5 +147,18 @@
     "club_terms": "Términos Club Crooki",
     "club_image_alt": "Tarjeta Crooki Rewards con código QR para agregarla a Apple Wallet o Google Wallet",
     "club_cta": "Obtener mi tarjeta del Club"
+  },
+  "footer": {
+    "cta_title": "¿Antojo de galletas?",
+    "cta_subtitle": "Recién horneadas todos los días en el Centro Histórico de Cartagena.",
+    "whatsapp": "Escríbenos",
+    "tagline": "Galletas artesanales hechas con los mejores ingredientes y mucho amor.",
+    "visit": "Visítanos",
+    "hours": "Horario",
+    "hours_days": "Todos los días",
+    "hours_time": "11:00 a.m. – 9:00 p.m.",
+    "explore": "Explora",
+    "club": "Club Crooki",
+    "rights": "Todos los derechos reservados."
   }
 }
