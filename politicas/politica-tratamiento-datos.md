@@ -16,7 +16,7 @@ Esta política explica cómo Crooki recolecta, usa, guarda y protege los datos p
 
 - **Identificación y contacto:** nombre, número de celular y, de forma opcional, correo electrónico.
 - **Fecha de cumpleaños** (día y mes), opcional, para el beneficio de cumpleaños.
-- **Historial en el Club:** fechas y valores de compra, sellos acumulados, premios canjeados y mensajes recibidos.
+- **Historial en el Club:** fechas y valores de compra, Bonus acumulados, premios canjeados y mensajes recibidos.
 - **Pedidos en el sitio web:** nombre, correo electrónico, teléfono / WhatsApp, dirección de entrega, teléfono de quien recibe el pedido, comentarios del pedido y los productos y valores pedidos.
 
 Crooki no solicita datos sensibles (salud, religión, orientación, datos biométricos, entre otros) ni datos financieros a través del Club ni del sitio web. Los pagos no se procesan en el sitio.
@@ -26,7 +26,7 @@ Crooki no solicita datos sensibles (salud, religión, orientación, datos biomé
 Los datos se usan únicamente para:
 
 1. Recibir, preparar y entregar los pedidos hechos en el sitio web, y contactar al cliente y a quien recibe el pedido por WhatsApp o teléfono para confirmarlo y coordinar la entrega.
-2. Inscribir al cliente en el Club, registrar sus sellos y entregar sus premios.
+2. Inscribir al cliente en el Club, registrar sus Bonus y entregar sus premios.
 3. Enviarle por WhatsApp, SMS o correo información sobre su tarjeta, beneficios, promociones, lanzamientos y su beneficio de cumpleaños.
 4. Analizar hábitos de compra para agrupar clientes y ofrecer beneficios acordes a cada grupo.
 5. Medir los resultados del programa y mejorar productos y servicio.
@@ -73,7 +73,7 @@ Para operar el Club, Crooki usa la plataforma **Novu App** y el servicio de **Wh
 
 Los pedidos del sitio web se guardan en **Supabase**, el servicio de base de datos del sitio, y el sitio se aloja en **Vercel**. Ambos actúan como encargados, pueden tener servidores fuera de Colombia y están sujetos a las mismas condiciones descritas en el párrafo anterior.
 
-El acceso interno a la base de datos se limita al consultor y a las socias. El personal de caja solo registra sellos y canjes.
+El acceso interno a la base de datos se limita al consultor y a las socias. El personal de caja solo registra Bonus y canjes.
 
 ## 9. Seguridad y conservación
 

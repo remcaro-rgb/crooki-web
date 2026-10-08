@@ -34,7 +34,7 @@ Esta política explica cómo Crooki recolecta, usa, guarda y protege los datos p
 
 - **Identificación y contacto:** nombre, número de celular y, de forma opcional, correo electrónico.
 - **Fecha de cumpleaños** (día y mes), opcional, para el beneficio de cumpleaños.
-- **Historial en el Club:** fechas y valores de compra, sellos acumulados, premios canjeados y mensajes recibidos.
+- **Historial en el Club:** fechas y valores de compra, Bonus acumulados, premios canjeados y mensajes recibidos.
 - **Pedidos en el sitio web:** nombre, correo electrónico, teléfono / WhatsApp, dirección de entrega, teléfono de quien recibe el pedido, comentarios del pedido y los productos y valores pedidos.
 
 Crooki no solicita datos sensibles (salud, religión, orientación, datos biométricos, entre otros) ni datos financieros a través del Club ni del sitio web. Los pagos no se procesan en el sitio.
@@ -44,7 +44,7 @@ Crooki no solicita datos sensibles (salud, religión, orientación, datos biomé
 Los datos se usan únicamente para:
 
 1. Recibir, preparar y entregar los pedidos hechos en el sitio web, y contactar al cliente y a quien recibe el pedido por WhatsApp o teléfono para confirmarlo y coordinar la entrega.
-2. Inscribir al cliente en el Club, registrar sus sellos y entregar sus premios.
+2. Inscribir al cliente en el Club, registrar sus Bonus y entregar sus premios.
 3. Enviarle por WhatsApp, SMS o correo información sobre su tarjeta, beneficios, promociones, lanzamientos y su beneficio de cumpleaños.
 4. Analizar hábitos de compra para agrupar clientes y ofrecer beneficios acordes a cada grupo.
 5. Medir los resultados del programa y mejorar productos y servicio.
@@ -91,7 +91,7 @@ Para operar el Club, Crooki usa la plataforma **Novu App** y el servicio de **Wh
 
 Los pedidos del sitio web se guardan en **Supabase**, el servicio de base de datos del sitio, y el sitio se aloja en **Vercel**. Ambos actúan como encargados, pueden tener servidores fuera de Colombia y están sujetos a las mismas condiciones descritas en el párrafo anterior.
 
-El acceso interno a la base de datos se limita al consultor y a las socias. El personal de caja solo registra sellos y canjes.
+El acceso interno a la base de datos se limita al consultor y a las socias. El personal de caja solo registra Bonus y canjes.
 
 ## 9. Seguridad y conservación
 
@@ -127,7 +127,7 @@ This policy explains how Crooki collects, uses, stores and protects the personal
 
 - **Identification and contact:** name, mobile number and, optionally, email address.
 - **Birthday** (day and month), optional, for the birthday benefit.
-- **Club history:** purchase dates and amounts, stamps earned, rewards redeemed and messages received.
+- **Club history:** purchase dates and amounts, Bonus earned, rewards redeemed and messages received.
 - **Website orders:** name, email, phone / WhatsApp, delivery address, phone number of the person receiving the order, order notes and the products and amounts ordered.
 
 Crooki does not request sensitive data (health, religion, orientation, biometric data, among others) or financial data through the Club or the website. Payments are not processed on the site.
@@ -137,7 +137,7 @@ Crooki does not request sensitive data (health, religion, orientation, biometric
 Data is used only to:
 
 1. Receive, prepare and deliver orders placed on the website, and contact the customer and the person receiving the order by WhatsApp or phone to confirm it and arrange delivery.
-2. Enroll the customer in the Club, record their stamps and deliver their rewards.
+2. Enroll the customer in the Club, record their Bonus and deliver their rewards.
 3. Send them information by WhatsApp, SMS or email about their card, benefits, promotions, launches and their birthday benefit.
 4. Analyze purchasing habits to group customers and offer benefits suited to each group.
 5. Measure program results and improve products and service.
@@ -184,7 +184,7 @@ To run the Club, Crooki uses the **Novu App** platform and the **WhatsApp Busine
 
 Website orders are stored in **Supabase**, the site's database service, and the site is hosted on **Vercel**. Both act as processors, may have servers outside Colombia and are subject to the same conditions described in the previous paragraph.
 
-Internal access to the database is limited to the consultant and the partners. Checkout staff only record stamps and redemptions.
+Internal access to the database is limited to the consultant and the partners. Checkout staff only record Bonus and redemptions.
 
 ## 9. Security and retention
 
@@ -306,22 +306,22 @@ If we start using analytics or advertising cookies in the future, we will update
 
 ## Cómo funciona
 
-El Club Crooki es una tarjeta de sellos digital que se guarda en Apple Wallet o Google Wallet. No hay tarjeta física. Para inscribirte, escanea el código QR en el local y agrega la tarjeta a tu celular.
+El Club Crooki es una tarjeta digital de Bonus que se guarda en Apple Wallet o Google Wallet. No hay tarjeta física. Para inscribirte, escanea el código QR en el local y agrega la tarjeta a tu celular.
 
-- **Ganar sellos:** recibes 1 sello por cada $15.000 de compra en el local. Por ejemplo, una compra de $45.000 suma 3 sellos. Al pagar, muestra la tarjeta del Club desde tu Wallet.
-- **Recompensa:** al completar 8 sellos eliges uno gratis: una galleta clásica, un crunchy brownie, un cinnamon roll o un helado mediano con cualquier salsa.
+- **Ganar Bonus:** recibes 1 Bonus por visita al local con una compra mínima de $20.000. Al pagar, muestra la tarjeta del Club desde tu Wallet.
+- **Recompensa:** al completar 8 Bonus eliges uno gratis: una galleta clásica, un crunchy brownie, un cinnamon roll o un helado mediano con cualquier salsa.
 
 ## Términos
 
-1. Recibes 1 sello por cada $15.000 de compra en una misma factura en el local de Crooki. Los valores menores a $15.000 no suman sello.
-2. Los pedidos por Rappi u otras plataformas de domicilio no suman sellos.
-3. Al acumular 8 sellos obtienes una recompensa a elegir: galleta clásica, crunchy brownie, cinnamon roll o helado mediano con cualquier salsa.
-4. Cada sello es válido por 3 meses desde la fecha en que lo ganaste. Las recompensas deben reclamarse dentro de los 30 días siguientes a completar la tarjeta.
-5. Los sellos y las recompensas no se pueden cambiar, devolver, reemplazar ni canjear por dinero.
+1. Recibes 1 Bonus por visita al local de Crooki con una compra mínima de $20.000 en una misma factura. Las compras menores a $20.000 no suman Bonus, y se otorga máximo 1 Bonus por visita sin importar el valor de la compra.
+2. Los pedidos por Rappi u otras plataformas de domicilio no suman Bonus.
+3. Al acumular 8 Bonus obtienes una recompensa a elegir: galleta clásica, crunchy brownie, cinnamon roll o helado mediano con cualquier salsa.
+4. Cada Bonus es válido por 3 meses desde la fecha en que lo ganaste. Las recompensas deben reclamarse dentro de los 30 días siguientes a completar la tarjeta.
+5. Los Bonus y las recompensas no se pueden cambiar, devolver, reemplazar ni canjear por dinero.
 6. La recompensa no es acumulable con otras promociones o descuentos.
 7. La tarjeta es personal: no se puede transferir ni combinar con otras tarjetas. Solo se permite una tarjeta por persona.
 8. El programa no aplica para socias ni empleados de Crooki.
-9. Crooki puede anular sellos o tarjetas cuando haya fraude o mal uso del programa.
+9. Crooki puede anular Bonus o tarjetas cuando haya fraude o mal uso del programa.
 10. Crooki puede modificar o terminar el programa avisando con 30 días de anticipación por los canales autorizados. Los premios ya ganados se respetarán.
 11. Crooki es responsable del tratamiento de tus datos, conforme a su [Política de Tratamiento de Datos](/legal/politica-de-datos). La plataforma Novu App los procesa por cuenta de Crooki para operar el Club.`,
     },
@@ -331,22 +331,22 @@ El Club Crooki es una tarjeta de sellos digital que se guarda en Apple Wallet o 
 
 ## How it works
 
-Club Crooki is a digital stamp card saved in Apple Wallet or Google Wallet. There is no physical card. To join, scan the QR code in store and add the card to your phone.
+Club Crooki is a digital Bonus card saved in Apple Wallet or Google Wallet. There is no physical card. To join, scan the QR code in store and add the card to your phone.
 
-- **Earning stamps:** you get 1 stamp for every COP $15,000 spent in store. For example, a COP $45,000 purchase earns 3 stamps. When paying, show your Club card from your Wallet.
-- **Reward:** after collecting 8 stamps you choose one free item: a classic cookie, a crunchy brownie, a cinnamon roll or a medium ice cream with any sauce.
+- **Earning Bonus:** you get 1 Bonus per store visit with a minimum purchase of COP $20,000. When paying, show your Club card from your Wallet.
+- **Reward:** after collecting 8 Bonus you choose one free item: a classic cookie, a crunchy brownie, a cinnamon roll or a medium ice cream with any sauce.
 
 ## Terms
 
-1. You get 1 stamp for every COP $15,000 spent on a single receipt at the Crooki store. Amounts under COP $15,000 do not earn a stamp.
-2. Orders through Rappi or other delivery platforms do not earn stamps.
-3. After collecting 8 stamps you get a reward of your choice: classic cookie, crunchy brownie, cinnamon roll or medium ice cream with any sauce.
-4. Each stamp is valid for 3 months from the date you earned it. Rewards must be claimed within 30 days of completing the card.
-5. Stamps and rewards cannot be exchanged, returned, replaced or redeemed for cash.
+1. You get 1 Bonus per visit to the Crooki store with a minimum purchase of COP $20,000 on a single receipt. Purchases under COP $20,000 do not earn Bonus, and a maximum of 1 Bonus is given per visit regardless of the purchase amount.
+2. Orders through Rappi or other delivery platforms do not earn Bonus.
+3. After collecting 8 Bonus you get a reward of your choice: classic cookie, crunchy brownie, cinnamon roll or medium ice cream with any sauce.
+4. Each Bonus is valid for 3 months from the date you earned it. Rewards must be claimed within 30 days of completing the card.
+5. Bonus and rewards cannot be exchanged, returned, replaced or redeemed for cash.
 6. The reward cannot be combined with other promotions or discounts.
 7. The card is personal: it cannot be transferred or combined with other cards. Only one card per person.
 8. The program does not apply to Crooki partners or employees.
-9. Crooki may cancel stamps or cards in case of fraud or misuse of the program.
+9. Crooki may cancel Bonus or cards in case of fraud or misuse of the program.
 10. Crooki may modify or end the program with 30 days' notice through the authorized channels. Rewards already earned will be honored.
 11. Crooki is the controller of your data, under its [Personal Data Processing Policy](/legal/politica-de-datos). The Novu App platform processes it on Crooki's behalf to run the Club.`,
     },
