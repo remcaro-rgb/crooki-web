@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import Crumbs from "@/components/layout/Crumbs";
 import { routing } from "@/i18n/routing";
 import { getLegalDoc, legalDocs } from "@/content/legal";
 import LegalMarkdown from "@/components/legal/LegalMarkdown";
@@ -42,8 +43,9 @@ export default async function LegalDocPage({
 
   return (
     <div>
-      <div className="py-16 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
-        <h1 className="text-3xl md:text-5xl font-black max-w-3xl mx-auto">{content.title}</h1>
+      <div className="relative overflow-hidden py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
+        <Crumbs className="opacity-70" />
+        <h1 className="relative text-3xl md:text-5xl font-black max-w-3xl mx-auto">{content.title}</h1>
       </div>
 
       <div className="py-12 px-4 bg-white">

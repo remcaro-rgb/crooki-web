@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import Crumbs from "@/components/layout/Crumbs";
 import { legalDocs } from "@/content/legal";
 
 export async function generateMetadata({
@@ -24,9 +25,10 @@ export default async function LegalIndexPage({
 
   return (
     <div>
-      <div className="py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
-        <h1 className="text-5xl md:text-6xl font-black mb-4">{t("title")}</h1>
-        <p className="text-white/80 text-lg">{t("subtitle")}</p>
+      <div className="relative overflow-hidden py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
+        <Crumbs className="opacity-70" />
+        <h1 className="relative text-5xl md:text-6xl font-black mb-4">{t("title")}</h1>
+        <p className="relative text-white/80 text-lg">{t("subtitle")}</p>
       </div>
 
       <div className="py-16 px-4 bg-white">
