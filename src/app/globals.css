@@ -185,3 +185,23 @@
       radial-gradient(circle 32px at calc(100% - 16px) -8px, transparent 98%, #000);
   }
 }
+
+/* Club Crooki Bonus rain (components/legal/BonusRain.tsx) */
+@keyframes bonus-fall {
+  from { transform: translateY(-15vh); }
+  to { transform: translateY(110vh); }
+}
+@keyframes bonus-sway {
+  0%, 100% { transform: translateX(-12px); }
+  50% { transform: translateX(12px); }
+}
+.bonus-drop {
+  animation-name: bonus-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.bonus-sway {
+  animation-name: bonus-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

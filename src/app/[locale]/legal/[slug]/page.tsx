@@ -7,6 +7,7 @@ import Crumbs from "@/components/layout/Crumbs";
 import { routing } from "@/i18n/routing";
 import { getLegalDoc, legalDocs } from "@/content/legal";
 import LegalMarkdown from "@/components/legal/LegalMarkdown";
+import BonusRain from "@/components/legal/BonusRain";
 
 // Club Crooki digital card (same link as the QR in /public/reward.png).
 const CLUB_SIGNUP_URL = "https://take.cards/jFMFg";
@@ -43,6 +44,7 @@ export default async function LegalDocPage({
 
   return (
     <div>
+      {slug === "terminos-club-crooki" && <BonusRain />}
       <div className="relative overflow-hidden py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
         <Crumbs className="opacity-70" />
         <h1 className="relative text-3xl md:text-5xl font-black max-w-3xl mx-auto">{content.title}</h1>
