@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import ProductGrid from "@/components/menu/ProductGrid";
 import type { CategoryRow, Product } from "@/lib/types";
 import { mockProducts } from "@/lib/mock-products";
+import Crumbs from "@/components/layout/Crumbs";
 
 async function loadCatalog(): Promise<{ categories: CategoryRow[]; products: Product[] }> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your_")) {
@@ -47,9 +48,10 @@ export default async function MenuPage({
 
   return (
     <div>
-      <div className="py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
-        <h1 className="text-5xl md:text-6xl font-black mb-4">{t("title")}</h1>
-        <p className="text-white/80 text-lg">{t("subtitle")}</p>
+      <div className="relative overflow-hidden py-20 px-4 text-center text-white" style={{ backgroundColor: "#8b0031" }}>
+        <Crumbs className="opacity-70" />
+        <h1 className="relative text-5xl md:text-6xl font-black mb-4">{t("title")}</h1>
+        <p className="relative text-white/80 text-lg">{t("subtitle")}</p>
       </div>
 
       <div className="py-16 px-4 bg-white">
