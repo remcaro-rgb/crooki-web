@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { mockMerch } from "@/lib/mock-products";
 import MerchGrid from "@/components/menu/MerchGrid";
@@ -49,7 +50,57 @@ export default async function MerchPage({
         <p className="relative text-white/80 text-lg">{t("subtitle")}</p>
       </div>
 
-      <div className="py-16 px-4 bg-white">
+      {/* Brand story: lifestyle photo + selling copy, before the products */}
+      <section className="py-16 md:py-24 px-4" style={{ backgroundColor: "#fdf8f0" }}>
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+          <Image
+            src="/merch2.jpeg"
+            alt={t("story_image_alt")}
+            width={1024}
+            height={993}
+            sizes="(min-width: 768px) 560px, 100vw"
+            className="w-full h-auto rounded-3xl shadow-xl"
+            priority
+          />
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#8b0031] mb-4">
+              {t("story_eyebrow")}
+            </p>
+            <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-6">
+              {t.rich("story_title", {
+                logo: () => (
+                  <Image
+                    src="/crooki-wordmark-red.png"
+                    alt="Crooki"
+                    width={913}
+                    height={224}
+                    className="inline-block h-[0.8em] w-auto align-baseline"
+                  />
+                ),
+              })}
+            </h2>
+            <p className="text-gray-700 text-lg leading-relaxed mb-4">{t("story_p1")}</p>
+            <p className="text-gray-700 text-lg leading-relaxed mb-6">{t("story_p2")}</p>
+            <ul className="space-y-3 mb-8">
+              {(["story_b1", "story_b2", "story_b3", "story_b4"] as const).map((key) => (
+                <li key={key} className="flex items-start gap-3 text-gray-800 font-semibold">
+                  <span className="mt-1 text-[#8b0031]" aria-hidden="true">●</span>
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#coleccion"
+              className="inline-block text-white font-bold px-8 py-4 rounded-full transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#8b0031" }}
+            >
+              {t("story_cta")} ↓
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div id="coleccion" className="scroll-mt-16 py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <MerchGrid products={products} locale={locale} />
         </div>

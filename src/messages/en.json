@@ -45,7 +45,17 @@
   },
   "merch": {
     "title": "Crooki Merch",
-    "subtitle": "Take a piece of Crooki home with you"
+    "subtitle": "Take a piece of Crooki home with you",
+    "story_image_alt": "Woman wearing the Crooki Club cap, the First Batch tee and the Crooki Lovers Club tote bag in front of the Clock Tower in Cartagena",
+    "story_eyebrow": "Made in Cartagena",
+    "story_title": "Take a little piece of <logo></logo> (and Cartagena) with you",
+    "story_p1": "Our merch is born on the same streets where we bake every cookie: among colorful balconies, the Clock Tower and the warmth of the Historic Center. Every piece is designed so you can take home that craving that made you smile.",
+    "story_p2": "High-quality apparel and accessories with exclusive designs you won’t find anywhere else. Comfortable for every day, cute for your photos and perfect as a gift.",
+    "story_b1": "Exclusive Crooki designs",
+    "story_b2": "Quality materials, made to last",
+    "story_b3": "The perfect gift for cookie lovers",
+    "story_b4": "First Batch collection: our very first edition",
+    "story_cta": "Shop the collection"
   },
   "cart": {
     "title": "Your order",

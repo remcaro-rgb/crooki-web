@@ -45,7 +45,17 @@
   },
   "merch": {
     "title": "Merch Crooki",
-    "subtitle": "Llévate un pedacito de Crooki contigo"
+    "subtitle": "Llévate un pedacito de Crooki contigo",
+    "story_image_alt": "Chica con la gorra Crooki Club, la camiseta First Batch y el tote bag Crooki Lovers Club frente a la Torre del Reloj en Cartagena",
+    "story_eyebrow": "Hecho en Cartagena",
+    "story_title": "Llévate un pedacito de <logo></logo> (y de Cartagena) contigo",
+    "story_p1": "Nuestra merch nace en las mismas calles donde horneamos cada galleta: entre balcones de colores, la Torre del Reloj y el calor del Centro Histórico. Cada pieza está pensada para que te lleves a casa ese antojo que te hizo sonreír.",
+    "story_p2": "Prendas y accesorios de alta calidad, con diseños exclusivos que no vas a encontrar en ningún otro lugar. Cómodos para el día a día, lindos para tus fotos y perfectos para regalar.",
+    "story_b1": "Diseños exclusivos de Crooki",
+    "story_b2": "Materiales de calidad, hechos para durar",
+    "story_b3": "El regalo perfecto para los amantes de las galletas",
+    "story_b4": "Colección First Batch: nuestra primera edición",
+    "story_cta": "Ver la colección"
   },
   "cart": {
     "title": "Tu pedido",
