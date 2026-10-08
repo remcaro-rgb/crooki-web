@@ -60,8 +60,19 @@ export default function Footer() {
   const tl = useTranslations("legal");
 
   return (
-    <footer style={{ backgroundColor: "#8b0031" }} className="text-white">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+    <footer style={{ backgroundColor: "#8b0031" }} className="relative overflow-hidden text-white">
+      {/* Decorative crumbs in the top corners: each half of crumbs.webp is
+          pinned to its corner at a fixed size so it never spreads under the
+          text on wide screens, and fades out downward. */}
+      {(["left", "right"] as const).map((side) => (
+        <div
+          key={side}
+          aria-hidden="true"
+          className={`pointer-events-none absolute top-0 ${side === "left" ? "left-0" : "right-0"} w-1/2 max-w-[280px] md:max-w-[450px] h-[190px] md:h-[300px] bg-no-repeat bg-[length:560px_auto] md:bg-[length:900px_auto] opacity-40 [mask-image:linear-gradient(to_bottom,black_35%,transparent)]`}
+          style={{ backgroundImage: "url(/crumbs.webp)", backgroundPosition: `${side} top` }}
+        />
+      ))}
+      <div className="relative max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="text-3xl font-black tracking-tight mb-3">CROOKI</div>
